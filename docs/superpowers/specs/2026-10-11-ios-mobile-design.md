@@ -48,7 +48,8 @@ opencode today, and gets richer as each harness gains ACP (level 3).
 | Session host seam | Built, in the app's process | `app/src-tauri/src/host.rs` (`SessionHost`, `ChatBoard`) |
 | Session protocol: list, attach (snapshot + live view), write, resize, answer, stop, start, subscribe(since) | Built and tested, not served to anyone outside the app | `crates/session-protocol` (tokio, Yamux, HMAC admission, N−1 compatibility) |
 | Client scopes table | Built | `session-protocol::grants`. `remote-link` exists, and no build admits it until RR-13's handshake |
-| One `Ask` model across Claude Code, Codex, opencode and ACP | Built | `crates/purlis-core/src/harness/asked.rs` |
+| One `Ask` model across Claude Code, Codex, opencode and ACP, each choice with a `ChoiceScope` of *once*, *session* or *always* | Built. opencode's "always" is read as *session*, because it lasts only for the rest of the session | `crates/purlis-core/src/harness/asked.rs` |
+| A chat as `list` describes it: id, project, path hint, title, state. **No workspace, no level** | Built | `session-protocol::session::Chat` |
 | ACP client (level 3): message text, tool calls, plan, usage, asks, elicitation as events | Built. opencode only for now, and refused in sandboxed projects (D-87h) | `crates/purlis-core/src/acp.rs` |
 | Event log with subscribe-from-cursor | Built. Holds **a digest of tool arguments, never the arguments** (ruling O3) | `crates/purlis-core/src/eventlog.rs` |
 | Link key (X25519), Noise `XX`, the two pinned records | **Decided, not yet written** | ADR 0078 §3; `docs/plane-format.md` rows `<config>/peers.json` and the link-key keyring item |
@@ -74,9 +75,9 @@ opencode today, and gets richer as each harness gains ACP (level 3).
 
 | Unit | Job | Depends on |
 |---|---|---|
-| `purlis-core::remote` | Listens when the operator turns it on, runs Noise `XX`, refuses a key it has not pinned before reading any frame, then serves the session protocol under `remote-device`. Implements the protocol crate's `Host` by delegating to `SessionHost`/`ChatBoard` | session-protocol, the pinned records, the link key |
+| `purlis-core::remote` | Listens when the operator turns it on, runs Noise `XX`, refuses a key it has not pinned before reading any frame (except during a pairing window, §4.2), then serves the session protocol under `remote-device`. Implements the protocol crate's `Host` by delegating to `SessionHost`/`ChatBoard` | session-protocol, the pinned records, the link key |
 | Timeline adapter (in `remote`) | Turns `acp::Event`, hook reports and the board's `Ask`s into one ordered stream per chat. Never reads terminal bytes | `acp`, the board, `harness::asked` |
-| `session-protocol` additions | The `timeline` stream kind and the `prompt` command (§5) | — |
+| `session-protocol` additions | The `remote-device` scope, the `timeline` stream kind, the `prompt` command, and `workspace` and `level` on a listed chat (§5) | — |
 | `crates/purlis-mobile-core` | The phone's Rust side: connection, reconnect from cursor, the link key in the iOS Keychain, a small set of Tauri commands | session-protocol, `snow`, `security-framework` |
 | `mobile/` | The Tauri 2 iOS app (`tauri ios init`) and its React UI. It reuses `app/src/theme` and the copy rules, and none of the desktop's components | purlis-mobile-core |
 
@@ -102,14 +103,22 @@ versioned session protocol.
   - **On the phone:** the desktop's device id, pinned key and address candidates.
 - The relay in phase 3 pairs into exactly these records, so a phone paired over Wi-Fi and later
   reached through the relay is one pairing (RR-2's rule, applied to devices).
+- **The gateway's settings** (off by default; which interfaces it binds; its port) and **D10's
+  keep-awake setting** are keys in `<config>/machine.json` (Machine, device-bound: they are
+  facts about this Mac, not about a project, and they must not sync to another machine). That
+  row's description widens in `docs/plane-format.md` before any code writes either key.
+  Neither is a new store.
 
 ### 4.2 Pairing
 
 1. **Settings → Devices → Pair a phone** (desktop window only). The window shows a QR code
    carrying the desktop's public link key, its address candidates and a **one-time code**: 5
    minutes, single use.
-2. The phone scans it, connects and runs Noise `XX`. Inside the encrypted channel it proves the
-   code with an HMAC.
+2. The phone scans it, connects and runs Noise `XX`. **Only while a code is live** does the
+   gateway complete a handshake with a key it has not pinned, and such a link may carry one
+   frame only: the pairing proof. Inside the encrypted channel the phone proves the code with
+   an HMAC. A wrong proof, or anything but a proof, closes the link and the code is spent.
+   Outside a pairing window an unpinned key is dropped before any frame is read.
 3. **The window asks the person:** *"Pair 'Noro's iPhone'? Key fingerprint 3F2A…"*, with
    **Pair** and **Cancel**. Only the window can confirm, because an agent's word is never consent
    (ADR 0090). A photo of the QR code alone pairs nothing.
@@ -121,7 +130,12 @@ link from that device at once.
 
 ### 4.3 The `remote-device` scope
 
-A new column in `session-protocol::grants`:
+A new `auth::Scope`, and a new column in `session-protocol::grants`. Three powers are new:
+`Timeline` (attach a timeline), `Prompt`, and `AnswerAlways` (answer with a choice whose scope
+is *always*). The last is checked the way `AnswerASecret` is today: `serve` asks the host
+`choice_lasts(chat, ask, answer)` before the command reaches it, and a host that does not
+say is taken to mean *yes*, so the refusal fails closed. The host answers from the choice's
+`ChoiceScope`: *once* and *session* pass, *always* does not.
 
 | Command | `remote-device` |
 |---|---|
@@ -151,7 +165,9 @@ secret as *"Answer this on your desktop"* with no buttons.
 
 **Audit:** ADR 0075's store is not built yet. Until it is, pairing, unpairing, connecting,
 answering and prompting from a device go to the event log as metadata (device id, chat, what
-kind, never the text), and move to the audit when it exists.
+kind, which choice id), and move to the audit when it exists. Never the text: not a prompt's,
+not a message's, not an answer's free text. The event log is on disk; D9 forbids any of that
+text leaving the host's memory for this feature.
 
 ## 5. Protocol additions (session-protocol, a new minor version)
 
@@ -181,7 +197,7 @@ feature (D9).
   `turn_running`, and the phone offers **Stop** or waiting.
 - **Terminal chat:** one bracketed paste plus Enter in a single write, through the writer that
   Smart close and curation already use. A harness that is mid-turn queues it its own way.
-- **Shell tab:** refused, with `not_an_agent`. The phone offers raw `write` there.
+- **Shell tab:** refused, with `not_an_agent`. The phone offers raw `write` there (§6.1).
 
 ### 5.3 `answer`
 
@@ -193,10 +209,19 @@ changes (§4.3).
 A chat's terminal is one terminal. Resizing it to a phone's width would reflow the desktop's
 pane. The phone draws the terminal at the desktop's size, zoomable and scrollable sideways.
 
-### 5.5 Compatibility
+### 5.5 `list` gains `workspace` and `level`
+
+A listed chat gains two optional fields: `workspace` (its workspace's name, or absent for the
+project's root; `Start` already carries the same) and `level` (1, 2 or 3, ADR 0073). Home
+groups by the first and the chat screen picks its drawing by the second. A shell tab lists
+with `level: 1`.
+
+### 5.6 Compatibility
 
 N−1 holds: a host without `timeline` or `prompt` refuses them as unknown, and the phone falls
-back to the terminal view and raw `write`. The crate's compatibility tests gain both.
+back to the terminal view and raw `write`. A host that omits `workspace` and `level` lists its
+chats under the project with no grouping, drawn as terminals. The crate's compatibility tests
+gain all four.
 
 ## 6. The iOS app
 
@@ -213,6 +238,9 @@ back to the terminal view and raw `write`. The crate's compatibility tests gain 
    - **Level 2:** the timeline strip above an xterm.js mirror at the desktop's size, and a
      quick-key bar: Esc ↑ ↓ Enter Tab y n Ctrl-C.
    - **Both:** a composer (Send is `prompt`) and **Stop** while a turn runs.
+   - **Shell tab (level 1):** the terminal mirror and the quick-key bar only. Typed text goes
+     by raw `write`; there is no composer, no timeline and no Stop. It is listed on Home under
+     its workspace like any chat, so what the desktop shows the phone shows.
 4. **Ask sheet:** the summary, then the choices in the source's order and words, minus any
    *always* choice (D8). It closes with *"Answered on the desktop"* when the answer came from
    there.
@@ -245,7 +273,8 @@ A desktop setting, **"Keep this Mac awake while chats are running"**, off by def
 is on and at least one chat's run is `working` or `input-required`, the host holds a macOS
 power assertion that prevents idle system sleep (the display may still sleep). It is released
 the moment no chat qualifies, when the setting is turned off, and when the app quits. It is
-Machine state. A Linux equivalent (systemd-inhibit) follows the same rule.
+a key in `<config>/machine.json` (§4.1). A Linux equivalent (systemd-inhibit) follows the
+same rule.
 
 ## 7. Phases
 
@@ -257,18 +286,23 @@ Machine state. A Linux equivalent (systemd-inhibit) follows the same rule.
 | **3. Relay and push** | A small Rust relay (both sides dial out over WebSocket; it forwards Noise ciphertext by device id). Pairing through it yields the same pinned records. APNs push with an encrypted payload, decrypted on the phone by a Notification Service Extension into "<workspace> · <chat> needs you" (D11) | 3–4 weeks |
 | **4. With `purlisd`** | The gateway moves into the daemon, with no protocol change, so the phone keeps working after the window quits. `start` from the phone becomes a candidate | — |
 
+Each phase that lands something a person would notice (Settings → Devices, the keep-awake
+setting, the gateway, the phone app itself) adds `changes/<slug>.md` fragments, never a
+CHANGELOG.md edit (AGENTS.md). Phase 0 is throwaway and adds none.
+
 ## 8. Testing
 
 Each test follows the repo's own patterns. A test is trusted only once it has been seen to fail
 for the right reason (AGENTS.md).
 
 - **Gateway, in `purlis-core`, against `fake-harness`:**
-  - pairing: an expired code, a reused code, an unconfirmed pairing, an unknown key, a revoked key mid-link
+  - pairing: an expired code, a reused code, an unconfirmed pairing, an unknown key, a revoked key mid-link; an unpinned key outside a pairing window is dropped before a frame, and inside one may send only the proof
   - every row of §4.3, the refusals especially: `resize`, `start`, an *always* choice, a secret ask, the UI RPC
+  - `choice_lasts` fails closed: a host that does not implement it refuses every answer from `remote-device`
   - timeline items from a fake ACP agent and from recorded hook reports
-  - `prompt` routing at each level, `turn_running`
-  - nothing of a message's text in the event log
-- **Protocol:** the crate's N−1 compatibility tests for `timeline` and `prompt`.
+  - `prompt` routing at each level, `turn_running`, `not_an_agent`
+  - nothing of a message's, a prompt's or an answer's text in the event log
+- **Protocol:** the crate's N−1 compatibility tests for `timeline`, `prompt`, `workspace` and `level`.
 - **`purlis-mobile-core`:** integration tests against a real gateway in process, on the ordinary
   macOS and Linux CI. It's plain Rust, so no phone is needed.
 - **UI:**
