@@ -131,6 +131,9 @@ pub enum Refused {
     /// The place is a workspace this plane does not have.
     #[error("no workspace '{0}'")]
     NoWorkspace(String),
+    /// The project is one this purlis may not write ([`crate::compat::read_only`], #826).
+    #[error("nothing was written: {0}")]
+    ReadOnly(crate::compat::Why),
     /// The disk refused.
     #[error("could not write the session record: {0}")]
     Io(#[from] io::Error),
@@ -433,12 +436,16 @@ fn when_of(name: &str) -> String {
 /// Writes `new` as a record of its place, then rebuilds that place's index and, for a
 /// workspace, the `## Sessions` line in its `workspace.md`.
 ///
-/// Nothing is written unless [`check`] passes and the place is one this plane has. The record
-/// is replaced into place whole ([`crate::rewrite::replace`]), and its name is chosen and taken
-/// under a lock on the directory, so two records made in the same second are two files. The
-/// index and the pointer follow it; either failing is a warning on the [`Recorded`], not a lost
-/// record, because both are rebuilt from the records by the next one.
+/// Nothing is written unless the project is one this purlis may write (FR-24, #826), [`check`]
+/// passes and the place is one this plane has. The record is replaced into place whole
+/// ([`crate::rewrite::replace`]), and its name is chosen and taken under a lock on the
+/// directory, so two records made in the same second are two files. The index and the pointer
+/// follow it; either failing is a warning on the [`Recorded`], not a lost record, because both
+/// are rebuilt from the records by the next one.
 pub fn record(root: &Path, new: &New) -> Result<Recorded, Refused> {
+    if let Some(why) = crate::compat::read_only(root) {
+        return Err(Refused::ReadOnly(why));
+    }
     check(new.title, new.body).map_err(Refused::Shape)?;
     let place = &new.facts.place;
     let Some(dir) = dir(root, place) else {

@@ -228,6 +228,28 @@ fn a_workspace_this_plane_does_not_have_is_refused_and_nothing_is_written() {
 }
 
 #[test]
+fn a_project_this_purlis_may_not_write_gets_no_record_and_no_index() {
+    let dir = plane(&["alpha"]);
+    std::fs::write(
+        dir.path().join("charter.toml"),
+        "schema = 2\nrequires = [{ feature = \"from-the-future\", since = \"9.0.0\" }]\n",
+    )
+    .unwrap();
+    let ws = dir.path().join("workspaces/alpha");
+    let before = std::fs::read(ws.join("workspace.md")).unwrap();
+    for place in [alpha(), Place::PlaneRoot] {
+        let refused = write(dir.path(), "Ship", BODY, &facts(place, at(1, 1, 1)));
+        let Err(Refused::ReadOnly(why)) = &refused else {
+            panic!("{refused:?}");
+        };
+        assert!(why.to_string().contains("from-the-future"), "{why}");
+    }
+    assert!(!ws.join("sessions").exists());
+    assert!(!dir.path().join("sessions").exists());
+    assert_eq!(std::fs::read(ws.join("workspace.md")).unwrap(), before);
+}
+
+#[test]
 fn two_records_in_the_same_second_with_the_same_title_are_two_files() {
     let dir = plane(&["alpha"]);
     let one = write(dir.path(), "Same", BODY, &facts(alpha(), at(1, 2, 3))).unwrap();

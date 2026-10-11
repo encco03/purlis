@@ -47,9 +47,14 @@ impl Project {
 
     /// [`Project::run`] with `stdin` on its standard input.
     fn run_feeding(&self, args: &[&str], stdin: &str) -> Output {
+        self.run_feeding_with(args, &[], stdin)
+    }
+
+    /// [`Project::run_feeding`], with `env` set for the command.
+    fn run_feeding_with(&self, args: &[&str], env: &[(&str, &str)], stdin: &str) -> Output {
         use std::io::Write;
         let mut child = self
-            .command(args, &[])
+            .command(args, env)
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
@@ -93,6 +98,11 @@ impl Project {
     /// workspace with a memory, a change record and a session record, a harness profile in
     /// `charter.local.toml`, and a git repository with all of it committed.
     fn lived_in() -> Self {
+        Self::lived_in_with(&[])
+    }
+
+    /// [`Project::lived_in`], with `also` run on it while this purlis may still write it.
+    fn lived_in_with(also: &[&[&str]]) -> Self {
         let project = Project::new("");
         std::fs::remove_file(project.root.join("charter.toml")).unwrap();
         let ok = |args: &[&str], stdin: &str| {
@@ -171,6 +181,9 @@ impl Project {
              workspace: alpha\ncwd: unknown\n---\n\n# The widget\n\n## Goal\nShip it.\n",
         )
         .unwrap();
+        for args in also {
+            ok(args, "");
+        }
         // The manifest's first two lines become `REQUIRES`'s: `schema = 2` and the feature
         // this build lacks.
         let manifest = project.root.join("charter.toml");
@@ -541,4 +554,277 @@ fn workspace_current_only_reads_a_read_only_project() {
         &[("CHARTER_WORKSPACE", "alpha")],
         "alpha",
     );
+}
+
+// ---- a chat's hooks (#826 line 2, D-FR24b) -------------------------------------------------
+
+/// Every hook word this binary answers: the registry's, the permission prompt's and the words
+/// an older plugin still wires.
+fn every_hook_word(project: &Project) -> Vec<(String, String, Option<String>)> {
+    let out = project.run(&["hook", "--list", "--json"]);
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let doc: serde_json::Value = serde_json::from_slice(&out.stdout).expect("the registry");
+    let mut words: Vec<(String, String, Option<String>)> = doc["handlers"]
+        .as_array()
+        .expect("its handlers")
+        .iter()
+        .map(|h| {
+            (
+                h["name"].as_str().unwrap().to_owned(),
+                h["event"].as_str().unwrap().to_owned(),
+                h["matcher"].as_str().map(str::to_owned),
+            )
+        })
+        .collect();
+    words.push(("permissionrequest".into(), "PermissionRequest".into(), None));
+    for no_op in ["posttooluse-bash", "posttooluse-message"] {
+        words.push((no_op.into(), "PostToolUse".into(), None));
+    }
+    assert!(words.len() > 15, "{words:?}");
+    words
+}
+
+/// The payloads a harness hands `event` on a tool its `matcher` names: each one reaching the
+/// part of the hook that could write.
+fn payloads(root: &Path, event: &str, matcher: Option<&str>) -> Vec<serde_json::Value> {
+    use serde_json::json;
+    let cwd = root.display().to_string();
+    let base = |fields: serde_json::Value| {
+        let mut payload = json!({
+            "session_id": "s1",
+            "cwd": cwd,
+            "hook_event_name": event,
+            "transcript_path": root.join("no-transcript.jsonl").display().to_string(),
+        });
+        for (key, value) in fields.as_object().unwrap() {
+            payload[key] = value.clone();
+        }
+        payload
+    };
+    let memory = root
+        .join("workspaces/alpha/memory/new.md")
+        .display()
+        .to_string();
+    let plain = root.join("README.md").display().to_string();
+    let tool = |name: &str, input: serde_json::Value| {
+        base(
+            json!({"tool_name": name, "tool_input": input, "tool_use_id": "t1",
+            "tool_response": {"stdout": "", "stderr": "", "interrupted": false}}),
+        )
+    };
+    let first = matcher.and_then(|m| m.split('|').next()).unwrap_or("");
+    match (event, first) {
+        ("SessionStart", _) => vec![base(json!({"source": "startup", "model": "m"}))],
+        ("UserPromptSubmit", _) => vec![base(json!({
+            "prompt": "Build the importer, and pick between the two designs as you go."
+        }))],
+        (_, "Bash") => vec![
+            tool(
+                "Bash",
+                json!({"command": "purlis workspace remember 'a fact' -w alpha"}),
+            ),
+            tool("Bash", json!({"command": "ls"})),
+        ],
+        (_, "Read") => vec![tool("Read", json!({"file_path": plain}))],
+        (_, "Write") => {
+            let mut all = vec![tool(
+                "Write",
+                json!({"file_path": memory, "content": "a fact"}),
+            )];
+            // Past the memory habit's cadence, so its counter and its nudge are reached.
+            all.extend(
+                (0..13).map(|_| tool("Edit", json!({"file_path": plain, "new_string": "x"}))),
+            );
+            all
+        }
+        (_, "Skill") => vec![tool("Skill", json!({"skill": "purlis:persona"}))],
+        (_, "") if event.starts_with("PostToolUse") => vec![tool("Bash", json!({"command": "ls"}))],
+        (_, name) if !name.is_empty() => {
+            vec![tool(
+                name,
+                json!({"subagent_type": "general-purpose", "prompt": "look"}),
+            )]
+        }
+        _ => vec![base(json!({"message": "waiting", "reason": "other"}))],
+    }
+}
+
+/// What git would commit of the project: its status, untracked files one by one.
+fn committed_changes(project: &Project) -> String {
+    let out = Command::new("git")
+        .args([
+            "-c",
+            "gc.auto=0",
+            "status",
+            "--porcelain",
+            "--untracked-files=all",
+        ])
+        .current_dir(&project.root)
+        .env("HOME", &project.home)
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .output()
+        .expect("git runs");
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    String::from_utf8_lossy(&out.stdout).into_owned()
+}
+
+/// Every file under the project but this clone's own state: purlis's state folder, a
+/// workspace's piece records (`docs/plane-format.md` gives both the clone-state tier) and git's
+/// own. A LOCAL workspace's files are ignored and so in no git status, and still here.
+fn outside_clone_state(project: &Project) -> BTreeMap<PathBuf, Vec<u8>> {
+    project
+        .tree()
+        .into_iter()
+        .filter(|(path, _)| {
+            let parts: Vec<String> = path
+                .components()
+                .map(|c| c.as_os_str().to_string_lossy().into_owned())
+                .collect();
+            let first = parts.first().map(String::as_str);
+            !matches!(first, Some(".git" | ".charter" | ".purlis"))
+                && !(first == Some("workspaces")
+                    && parts.get(2).map(String::as_str) == Some("pieces"))
+        })
+        .collect()
+}
+
+/// The environment of a chat the person started in workspace `alpha` from a terminal: no app is
+/// listening, so every hook does its own work and tells nobody.
+const A_CHAT: &[(&str, &str)] = &[("CHARTER_WORKSPACE", "alpha")];
+
+#[test]
+fn a_chats_hooks_write_no_committed_file_in_a_read_only_project() {
+    // alpha is LIVE, so its manifest and memory are committed files git would show changed.
+    let project = Project::lived_in_with(&[&["workspace", "live", "alpha"]]);
+    assert_eq!(
+        committed_changes(&project),
+        "",
+        "the project starts committed"
+    );
+    let before = outside_clone_state(&project);
+    for (word, event, matcher) in every_hook_word(&project) {
+        for payload in payloads(&project.root, &event, matcher.as_deref()) {
+            let out = project.run_feeding_with(&["hook", &word], A_CHAT, &payload.to_string());
+            assert_ne!(
+                out.status.code(),
+                Some(2),
+                "{word} blocked: {}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            assert_eq!(
+                committed_changes(&project),
+                "",
+                "{word} wrote a committed file, on {payload}"
+            );
+            let after = outside_clone_state(&project);
+            let changed: Vec<&PathBuf> = before
+                .keys()
+                .chain(after.keys())
+                .filter(|path| before.get(*path) != after.get(*path))
+                .collect();
+            assert!(
+                changed.is_empty(),
+                "{word} wrote to the project: {changed:?}"
+            );
+        }
+    }
+}
+
+/// Each refusal of a chat's tool call, as the hook printed it, with its exit status.
+fn refusals(project: &Project) -> Vec<(String, Option<i32>, String)> {
+    use serde_json::json;
+    let vault = concat!(".charter/", "vaults/db.json");
+    let bash = |command: &str| json!({"session_id": "s1", "tool_name": "Bash", "tool_input": {"command": command}});
+    [
+        ("pretooluse", bash(&format!("cat {vault}"))),
+        ("pretooluse", bash("charter handoff beta")),
+        (
+            "pretooluse-read",
+            json!({"session_id": "s1", "tool_name": "Read", "tool_input": {"file_path": vault}}),
+        ),
+        (
+            "pretooluse-edit",
+            json!({"session_id": "s1", "tool_name": "Write", "cwd": ".",
+                "tool_input": {"file_path": ".charter/active-persona", "content": "x"}}),
+        ),
+    ]
+    .into_iter()
+    .map(|(word, payload)| {
+        let out = project.run_feeding_with(&["hook", word], A_CHAT, &payload.to_string());
+        let printed = String::from_utf8_lossy(&out.stdout).into_owned();
+        assert!(
+            printed.contains("\"permissionDecision\": \"deny\""),
+            "{word} on {payload} refuses: {printed}"
+        );
+        (word.to_owned(), out.status.code(), printed)
+    })
+    .collect()
+}
+
+#[test]
+fn a_chats_guards_refuse_in_a_read_only_project_exactly_as_in_a_writable_one() {
+    let project = Project::lived_in();
+    let read_only = refusals(&project);
+    // The same project, back in a format this purlis writes.
+    let manifest = project.root.join("charter.toml");
+    let text = std::fs::read_to_string(&manifest).unwrap();
+    let head: String = REQUIRES
+        .lines()
+        .take(2)
+        .map(|line| format!("{line}\n"))
+        .collect();
+    let writable = text.replacen(&head, "schema = 1\n", 1);
+    assert_ne!(text, writable, "{text}");
+    std::fs::write(&manifest, writable).unwrap();
+    assert_eq!(refusals(&project), read_only);
+}
+
+/// What a chat writes with a command of its own, in a chat the person started from a terminal:
+/// each one refused, naming why, and the project left as it was (#826).
+#[test]
+fn a_chats_memory_todos_and_session_records_are_refused_in_a_read_only_project() {
+    let project = Project::lived_in();
+    let before = outside_clone_state(&project);
+    let body = "## Goal\n\ng\n\n## Done\n\nd\n\n## Decisions\n\nx\n\n## Open\n\no\n\n\
+                ## How to resume\n\nr\n";
+    for (args, stdin) in [
+        (
+            &["workspace", "remember", "Another fact", "-w", "alpha"][..],
+            "",
+        ),
+        (
+            &["workspace", "todo", "Ship the importer", "-w", "alpha"],
+            "",
+        ),
+        (&["persona", "remember", "steward", "A persona fact"], ""),
+        (
+            &[
+                "session",
+                "record",
+                "--title",
+                "The importer",
+                "-w",
+                "alpha",
+            ],
+            body,
+        ),
+    ] {
+        let out = project.run_feeding_with(args, A_CHAT, stdin);
+        let said = String::from_utf8_lossy(&out.stderr);
+        assert!(!out.status.success(), "{args:?} must be refused: {said}");
+        assert!(said.contains("memory-proposals"), "{args:?}: {said}");
+        assert_eq!(
+            outside_clone_state(&project),
+            before,
+            "{args:?} wrote to the project"
+        );
+    }
 }

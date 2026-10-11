@@ -171,6 +171,17 @@ pub fn read(root: &Path) -> Compat {
     read_knowing(root, KNOWN)
 }
 
+/// Why this purlis may not write the project at `root`, or `None` when it may: [`read`], for a
+/// writer of a committed project file to ask before it writes (#826). A chat's hooks, the app's
+/// brokered writes and the terminal's commands reach the same writers, so the refusal is theirs
+/// and no caller can forget it. Clone state and machine stores are not asked about.
+pub fn read_only(root: &Path) -> Option<Why> {
+    match read(root) {
+        Compat::Writable => None,
+        Compat::ReadOnly(why) => Some(why),
+    }
+}
+
 /// [`read`], for a charter that has exactly the features `known`: how a build older than one of
 /// them answers the same project. [`read`] is this with [`KNOWN`].
 pub fn read_knowing(root: &Path, known: &[&str]) -> Compat {
