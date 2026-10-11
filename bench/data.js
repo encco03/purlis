@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791748078221,
+  "lastUpdate": 1791751258127,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7812,6 +7812,48 @@ window.BENCHMARK_DATA = {
             "value": 104.7594435,
             "unit": "ms",
             "extra": "median of 5 runs: 103.666, 104.349, 104.759, 105.642, 106.258 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "eb1f9b451e1fc630bb2c33f262423f4de535ff4c",
+          "message": "dependabot: hold WebdriverIO majors until @wdio/tauri-service moves\n\n@wdio/tauri-service 1.5.0, the latest, requires webdriverio ^9, so #1636's WebdriverIO 10\nbroke every scenario run and was left out of #1766. Without this the web group proposes it\nagain each week. The service is not held, so its own release for 10 is what proposes the move.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T22:54:21+04:00",
+          "tree_id": "07b6df506648f2f2289bcb994687206ef10ccaca",
+          "url": "https://github.com/purlis/purlis/commit/eb1f9b451e1fc630bb2c33f262423f4de535ff4c"
+        },
+        "date": 1791751257217,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5361205,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.533, 0.533, 0.536, 0.539, 0.541 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.6625635,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.423, 16.548, 16.663, 16.991, 17.203 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 103.18790999999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.896, 102.104, 103.188, 103.685, 104.227 ms"
           }
         ]
       }
