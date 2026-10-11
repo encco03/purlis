@@ -223,9 +223,11 @@ async fn answering_an_ask_is_never_served_on_the_link_even_to_the_window() {
     // And several rows typed into a chat as one paste, held to the window until typing into a
     // chat has its ruling (#1151).
     assert!(ui::WINDOW_ONLY.contains(&"references_into_chat"));
+    // And why a project is read-only to this purlis, said in its tab (#826).
+    assert!(ui::WINDOW_ONLY.contains(&"project_read_only"));
     assert_eq!(
         ui::WINDOW_ONLY.len(),
-        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1
+        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1
     );
 }
 

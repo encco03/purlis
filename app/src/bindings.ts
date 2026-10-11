@@ -205,6 +205,29 @@ export const commands = {
 	 */
 	windowHoldsPlanes: (held: WindowTabs) => __TAURI_INVOKE<void>("window_holds_planes", { held }),
 	/**
+	 *  Why this purlis opens `plane` read-only, or null when it may write it.
+	 * 
+	 *  Read off the disk on every ask, never cached: a pull that adds a `requires` entry makes the
+	 *  project read-only from that moment, and the window asks again when the project changes.
+	 */
+	projectReadOnly: (plane: PlaneId) => typedError<{
+	/**
+	 *  The one sentence the project's tab says, and every disabled write action repeats: what
+	 *  is missing, which version has it, and what to do.
+	 */
+	sentence: string,
+	/**
+	 *  The feature the project requires that this purlis lacks. Null when the project is
+	 *  read-only for another reason (a manifest it cannot read, a schema it cannot place).
+	 */
+	feature: string | null,
+	/**
+	 *  The first purlis version that has [`Self::feature`], as the project's manifest names
+	 *  it. Null when it names none, or when no feature is missing.
+	 */
+	since: string | null,
+} | null, string>(__TAURI_INVOKE("project_read_only", { plane })),
+	/**
 	 *  Moves projects into another window — **a new one when `to` is null** — and answers the
 	 *  label of the window they are now in.
 	 * 
@@ -6588,6 +6611,25 @@ export type ReachedBy =
 "persona" | 
 /**  An Allowed host: for this chat, this project on this machine, or everyone in it. */
 "allowed";
+
+/**  Why this purlis reads a project and writes nothing to it. */
+export type ReadOnlyProject = {
+	/**
+	 *  The one sentence the project's tab says, and every disabled write action repeats: what
+	 *  is missing, which version has it, and what to do.
+	 */
+	sentence: string,
+	/**
+	 *  The feature the project requires that this purlis lacks. Null when the project is
+	 *  read-only for another reason (a manifest it cannot read, a schema it cannot place).
+	 */
+	feature: string | null,
+	/**
+	 *  The first purlis version that has [`Self::feature`], as the project's manifest names
+	 *  it. Null when it names none, or when no feature is missing.
+	 */
+	since: string | null,
+};
 
 /**  The prefix rebuilds this conversation has paid for (`↻N 696k`). */
 export type Rebuilds = {

@@ -464,8 +464,13 @@ clone and this machine, and are still written.
   `.git`, write nothing**, and say where the link leads. A link that stays inside the project is
   read through like the file it points at, so its `requires` and `schema` count.
 - `purlis doctor`'s `schema` row fails with the same reason and its remedy.
-- **The window, and the hooks a chat runs, follow in #826, and no release carries this rule
-  without them.** Until #826 lands they do not check `requires` or `schema`.
+- **The hooks a chat runs write no committed project file** (#826): no session record, no
+  memory, no workspace manifest and no `personas/_skills` row. Each guard still answers as it
+  did, so a read-only project never weakens one.
+- **The window says it once, in the project's tab** (#826): which feature is missing and which
+  purlis version has it, in the sentence `purlis doctor` says. Each action that writes a
+  committed project file is disabled with that sentence, and the write is refused by the core
+  whatever the window shows.
 
 **The features this purlis knows** (`compat::KNOWN`); any other `requires` entry makes a project
 read-only to it:
@@ -3214,6 +3219,8 @@ handoff row (`charter/dispatch.py:170` docstring).
   Python's host derivation, `:48`-`:51`, only before a device id is minted); same
   `json.dumps(..., sort_keys=True)` + `\n`, same `O_APPEND`, `0o644` (`:80`-`:85`). Rows
   without a truthy `skill` are ignored on read (`:116`).
+- **Read-only projects:** no row is written in a project this purlis opens read-only (#826);
+  the skill's use is not recorded there.
 
 | Field | Type | Required / default | Meaning | Status | Source |
 |---|---|---|---|---|---|

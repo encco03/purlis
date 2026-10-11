@@ -272,6 +272,9 @@ pub const WINDOW_ONLY: &[&str] = &[
     // Several of the explorer's rows typed into a chat as the person (#1151): held to the
     // window until typing into a chat has its ruling.
     "references_into_chat",
+    // Why this purlis opens a project read-only (#826): the window's tab sentence, which no
+    // link needs.
+    "project_read_only",
 ];
 
 /// **The commands of who may dispatch to whom**, by name (spec #1483): every one is on
