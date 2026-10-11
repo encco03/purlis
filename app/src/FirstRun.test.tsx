@@ -259,6 +259,31 @@ describe("the first run's project template (FR-17)", () => {
 });
 
 describe("the first run", () => {
+  it("says what taking the repo in did to the project's forges (#1669)", async () => {
+    core((cmd) =>
+      cmd === "open_repo"
+        ? {
+            opened: {
+              opened: { plane: LOCAL, ask: null },
+              workspace: "widget",
+              cwd: CLONE,
+              harness: null,
+              instructions: 0,
+              forge_said: "GitLab was added to this project's forges.",
+            },
+            asks_forge: null,
+          }
+        : undefined,
+    );
+    render(<App />);
+
+    await openRepoByPath(REPO);
+
+    expect(
+      await screen.findByText("GitLab was added to this project's forges."),
+    ).toBeInTheDocument();
+  });
+
   it("costs three prompts at most, on its longest way to a chat (W10)", async () => {
     // A new machine, so the local project is asked about; a repo whose remote does not say
     // which forge; and two signed-in harnesses, so there is a choice to pick from.

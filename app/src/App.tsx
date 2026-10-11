@@ -703,9 +703,13 @@ function App() {
     [],
   );
 
-  /** What an opened repo puts in the window: its first chat, through the trust gate. */
+  /** What an opened repo puts in the window: its first chat, through the trust gate, and what
+   *  taking it in did to the project's forges, where there is something to say (#1669). */
   const openedRepo = useCallback((repo: OpenedRepo) => {
-    const { opened, workspace, cwd, harness, none_installed, instructions } = repo;
+    const { opened, workspace, cwd, harness, none_installed, instructions, forge_said } = repo;
+    // Said once, on the window's line: the repo is open either way, and a forge that was not
+    // added names its own fix (Settings › Project › Forges).
+    if (forge_said) setReport({ from: "repo.forge", refused: false, words: forge_said });
     const plane = opened.plane;
     const ask = opened.ask;
     setFirstChat((was) => ({
