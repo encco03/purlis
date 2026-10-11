@@ -14,13 +14,20 @@
 //! ([`refusal`]), and a call of purlis's own `dispatch` chat tools ([`tool_refusal`]).
 //!
 //! **This is advice a sub-agent meets, not a boundary it cannot cross.** It is a recognition
-//! of the usual shapes and never a shell, as the handoff guard says of itself: a dispatch
-//! behind a variable of the sub-agent's own, in a script file or inside an interpreter is not
-//! seen, and on a harness where `agent_id` was never measured (opencode) nothing is refused at
-//! all. A sub-agent that gets past it reaches exactly what its chat reaches, and no more: the
+//! of the usual shapes and never a shell, as the handoff guard says of itself. It reads a
+//! dispatch in every text a shell is handed to run, at every level up to the nesting cap: a
+//! `-c` string or an `eval`, one inside another, a here-string, a pipe into a shell, a heredoc
+//! fed to one, the command a `find -exec` runs (#1582, through the walk the other backstops
+//! share). What stays unseen: a shell outside the ones the guards name
+//! ([`shellwrap::STRING_SHELLS`]), or one reached through a remote login, another user or a
+//! container; a program behind a variable other than the one that names purlis's binary; a
+//! script written in one call and run in the next; a dispatch inside an interpreter. On a
+//! harness where `agent_id` was never measured (opencode) nothing is refused at all. A
+//! sub-agent that gets past it reaches exactly what its chat reaches, and no more: the
 //! chat its own chat could have started, listed under that chat where the person sees it. So
 //! nothing that grants a chat a dispatch should be described as never reaching its helpers.
 
+use crate::consentspelling::{self, Nested};
 use crate::dispatchdecision::{self, Asker, Decision, Mode, Persona, Request};
 use crate::handoffguard::Caller;
 use crate::proseguard::charter_words;
@@ -40,14 +47,40 @@ const WORD: &str = "dispatch";
 /// - **every segment** ([`shellseg::segment_argv`]). Newlines are segment boundaries, so a
 ///   line of a heredoc body that itself begins `purlis dispatch` counts too;
 /// - **one level into a string a shell runs** ([`shellwrap::shell_scripts`]): `bash -c '…'`,
-///   `sh -c "…"`, `eval …`, as the handoff guard looks into them;
+///   `sh -c "…"`, `eval …`, as the handoff guard looks into them; **then every level a shell
+///   is handed a text at** ([`further_in`], #1582): a string inside that string, a here-string
+///   or a pipe into a shell, a heredoc fed to one, a `find -exec`; past the nesting cap, a
+///   helper is refused unread;
 /// - **the variable that names purlis's own binary** as the program
 ///   ([`crate::plugin::BINARY_ENV`], under either name), which every chat the app starts has in
 ///   its environment.
 ///
 /// Each over-match refuses only a sub-agent, which is the safe direction.
 pub fn runs_dispatch(cmd: &str) -> bool {
-    a_segment_runs_it(cmd) || a_shell_string_runs_it(cmd)
+    a_segment_runs_it(cmd)
+        || a_shell_string_runs_it(cmd)
+        // Past the cap the text is not read, and a helper is refused all the same.
+        || further_in(cmd, |text| a_segment_runs_it(text).then_some(())).is_some()
+}
+
+/// What `look` finds in a text a shell is handed to run, past what the first-level readings
+/// here read (#1582): a `-c` string inside a `-c` string, a here-string or a pipe into a shell,
+/// a heredoc fed to one, the command a `find -exec` runs, at every level up to the nesting cap.
+/// Read through the one walk the handoff, consent and operator-rule backstops share
+/// ([`consentspelling::in_shell_strings_at_every_level_by`]), over the shared heredoc plan;
+/// `look` is handed each text as the shell reads it.
+///
+/// A text handed on past the cap is not read: it is [`Nested::TooDeep`], for the caller to
+/// refuse. Asked only of a call that may name the subcommand at all ([`shellwrap::may_name`]),
+/// so a command that names none is not read again.
+fn further_in<T>(cmd: &str, look: impl Fn(&str) -> Option<T>) -> Option<Nested<T>> {
+    if !shellwrap::may_name(cmd, WORD) {
+        return None;
+    }
+    let read = crate::heredoc::Heredocs::of(cmd);
+    consentspelling::in_shell_strings_at_every_level_by(&read, &|inner| {
+        look(&crate::handoffguard::as_the_shell_reads(&inner.text))
+    })
 }
 
 fn a_segment_runs_it(cmd: &str) -> bool {
@@ -73,7 +106,7 @@ fn names_our_binary(prog: &str) -> bool {
         .any(|spelling| spelling == name)
 }
 
-/// One level in, and no deeper: a string inside that string is not opened.
+/// One level in, and no deeper: a string inside that string is [`further_in`]'s.
 fn a_shell_string_runs_it(cmd: &str) -> bool {
     let Ok(toks) = shellseg::lex(&crate::heredoc::strip_reader_heredocs(cmd)) else {
         return false;
@@ -198,17 +231,37 @@ fn a_text_subcommand(cmd: &str) -> Option<TextSubcommand> {
     if let Some((sub, shape)) = in_a_segment(cmd) {
         return Some((sub, shape, None));
     }
-    let toks = shellseg::lex(&crate::heredoc::strip_reader_heredocs(cmd)).ok()?;
-    let toks = shellseg::split_punctuation(toks);
-    crate::heredoc::segments_of(&toks)
-        .iter()
-        .find_map(|(seg, _before)| {
-            let words: Vec<String> = seg.iter().map(|tok| tok.text.clone()).collect();
-            shellwrap::shell_scripts(&words).iter().find_map(|inner| {
-                let read = crate::handoffguard::as_the_shell_reads(inner);
-                in_a_segment(&read).map(|(sub, shape)| (sub, shape, Some(read)))
+    let one_level_in = || {
+        let toks = shellseg::lex(&crate::heredoc::strip_reader_heredocs(cmd)).ok()?;
+        let toks = shellseg::split_punctuation(toks);
+        crate::heredoc::segments_of(&toks)
+            .iter()
+            .find_map(|(seg, _before)| {
+                let words: Vec<String> = seg.iter().map(|tok| tok.text.clone()).collect();
+                shellwrap::shell_scripts(&words).iter().find_map(|inner| {
+                    let read = crate::handoffguard::as_the_shell_reads(inner);
+                    in_a_segment(&read).map(|(sub, shape)| (sub, shape, Some(read)))
+                })
             })
-        })
+    };
+    // Then every level a shell is handed a text at (#1582), each with the text it stands in.
+    // A text is read more than one way (as written, and as the shell that hands it on
+    // unquotes it), so the one taken is one whose substitution is live, where any is.
+    let further = || {
+        let live_in_the_call = crate::livesub::live_substitution(cmd).is_some();
+        let found = further_in(cmd, |text| {
+            in_a_segment(text)
+                .filter(|_| live_in_the_call || crate::livesub::live_substitution(text).is_some())
+                .map(|(sub, shape)| (sub, shape, text.to_owned()))
+        })?;
+        match found {
+            Nested::Found((sub, shape, text)) => Some((sub, shape, Some(text))),
+            // Not read: the handoff guard refuses a call nested past the cap before this
+            // guard is asked (A7 stands first in `toolgate`).
+            Nested::TooDeep => None,
+        }
+    };
+    one_level_in().or_else(further)
 }
 
 /// `(trace reason, denial)` for a call that runs `purlis dispatch report`, `tell`, `answer`,
@@ -492,6 +545,64 @@ mod tests {
         ] {
             assert!(refusal(cmd, a_sub_agent()).is_some(), "{cmd:?}");
             assert_eq!(refusal(cmd, the_chat()), None, "{cmd:?}");
+        }
+    }
+
+    /// #1582: a here-string, a pipe into a shell, a `-c` inside a `-c`, and the rest of what a
+    /// shell is handed, at every level, through the walk the other backstops share.
+    #[test]
+    fn a_dispatch_in_any_text_a_shell_is_handed_is_seen_at_every_level() {
+        for cmd in [
+            "bash <<< 'purlis dispatch --name x'",
+            "sh -s <<< \"purlis dispatch note hi\"",
+            "echo 'purlis dispatch --name x' | sh",
+            "printf '%s\\n' 'purlis dispatch --name x' | bash",
+            "bash -c \"sh -c 'purlis dispatch --name x'\"",
+            "eval \"bash -c 'purlis dispatch --name x'\"",
+            "bash -c \"bash <<< 'purlis dispatch --name x'\"",
+            "bash <<'EOF'\nbash -c \"purlis dispatch --name x\"\nEOF",
+            "find . -maxdepth 0 -exec sh -c 'purlis dispatch --name x' \\;",
+            "bash <(echo 'purlis dispatch --name x')",
+        ] {
+            assert!(refusal(cmd, a_sub_agent()).is_some(), "{cmd:?}");
+            assert_eq!(refusal(cmd, the_chat()), None, "{cmd:?}");
+        }
+        // Nested past the cap, a helper is refused unread.
+        let deep = (0..=crate::guardcaps::MAX_NESTING).fold("ls".to_owned(), |inner, _| {
+            format!("bash -c '{}'", inner.replace('\'', "'\\''"))
+        });
+        let deep = deep.replacen("ls", "echo dispatch", 1);
+        assert!(refusal(&deep, a_sub_agent()).is_some(), "{deep:?}");
+        // Text that only names a dispatch, at any level, is not one.
+        for cmd in [
+            "bash <<< 'echo purlis dispatch'",
+            "echo 'purlis dispatch --name x' | cat",
+            "bash -c \"sh -c 'echo purlis dispatch'\"",
+            "cat <<< 'purlis dispatch --name x'",
+        ] {
+            assert_eq!(refusal(cmd, a_sub_agent()), None, "{cmd:?}");
+        }
+    }
+
+    /// A7e reads a text subcommand at every level a shell is handed a text at, with the live
+    /// substitution in the text that level receives (#1582).
+    #[test]
+    fn a_dispatch_text_with_a_live_substitution_is_refused_at_every_level() {
+        for cmd in [
+            "bash <<< 'purlis dispatch note \"$(date)\"'",
+            "echo 'purlis dispatch note \"$(date)\"' | sh",
+            "bash -c \"sh -c 'purlis dispatch note \\\"\\$(date)\\\"'\"",
+            "bash -c \"bash <<< 'purlis dispatch ask \\`whoami\\`'\"",
+        ] {
+            let (reason, _) = text_refusal(cmd).unwrap_or_else(|| panic!("{cmd:?}"));
+            assert_eq!(reason, REASON_TEXT_SOURCE, "{cmd:?}");
+        }
+        for cmd in [
+            "bash <<< 'purlis dispatch note plain'",
+            "bash -c \"sh -c 'purlis dispatch note plain'\"",
+            "echo \"$(date)\"; bash <<< 'echo purlis dispatch note'",
+        ] {
+            assert_eq!(text_refusal(cmd), None, "{cmd:?}");
         }
     }
 

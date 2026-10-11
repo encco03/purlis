@@ -100,9 +100,12 @@ enum Shells {
     SomeRead(&'static [Shell]),
     /// No shell prints it: a mention, which the guard lets through.
     Mention,
+    /// No shell prints it, and the guard refuses it all the same: a reading on the safe side,
+    /// kept until a ruling narrows it. A guard may only ever refuse more than the shells run.
+    OverRead,
 }
 
-use Shells::{Mention, Read, SomeRead};
+use Shells::{Mention, OverRead, Read, SomeRead};
 
 /// Every shape, with `{V}` for the vault file, `{R}` for a reveal and `{ROOT}` for the project.
 fn shapes() -> Vec<(String, Shells)> {
@@ -368,7 +371,7 @@ fn every_shape_a_shell_reads_a_secret_with_is_refused_and_no_other() {
                 .iter()
                 .zip(&read)
                 .all(|(kind, &r)| kind.is_none_or(|kind| readers.contains(&kind) == r)),
-            Mention => !read.iter().any(|&r| r),
+            Mention | OverRead => !read.iter().any(|&r| r),
         };
         if !installed.is_empty() && !agrees {
             wrong.push(format!(
@@ -500,6 +503,32 @@ fn gated_shapes() -> Vec<(String, Shells)> {
         ("f(){ {G}; }; f", Read),
         ("function f { {G}; }; f", Read),
         ("echo \"$(f(){ {G}; }; f)\"", Read),
+        // A commit or pull request body in `"$(cat <<'EOF' … EOF\n)"`: a quoted heredoc's body
+        // is text, code spans and all, unless a `)` in it ends the substitution early in
+        // GNU bash 3.2.57, after which a backtick in the double quotes runs. The shared heredoc
+        // reading takes any `)` or backtick in such a body as one that may end it, so these are
+        // refused though no shell runs them: the safe side, and narrowing it is a ruling's.
+        (
+            "git commit -m \"$(cat <<'EOF'\nrefuses `f(){ {G}; }; f`\nEOF\n)\"",
+            OverRead,
+        ),
+        (
+            "git commit -m \"$(cat <<'EOF'\nrefuses `case x in x) {G};; esac`\nEOF\n)\"",
+            OverRead,
+        ),
+        (
+            "git commit -m \"$(cat <<'EOF'\nrefuses `echo \"$({G})\"`\nEOF\n)\"",
+            OverRead,
+        ),
+        (
+            "gh pr create --title t --body \"$(cat <<'EOF'\n- refuses `f(){ {G}; }; f`\nEOF\n)\"",
+            OverRead,
+        ),
+        ("echo \"$(cat <<'EOF'\n`f(){ {G}; }; f`\nEOF\n)\"", OverRead),
+        (
+            "echo \"$(cat <<'EOF'\nfix a)\n`{G}`\nEOF\n)\"",
+            SomeRead(&[Bash3]),
+        ),
         // Mentions.
         ("echo \"$(echo {G})\"", Mention),
         ("f(){ echo {G}; }; f", Mention),
@@ -528,10 +557,302 @@ fn gated_shapes() -> Vec<(String, Shells)> {
     out
 }
 
+/// The shapes only the handoff guard reads past (#1419): a `case` branch and a function body in
+/// every spelling a shell defines one, and a string or heredoc a shell runs handed on to another
+/// shell, at every level up to the cap.
+fn handoff_shapes() -> Vec<(String, Shells)> {
+    let mut out: Vec<(String, Shells)> = [
+        ("case x in x) {G};; esac", Read),
+        ("case x in y) :;; x) {G};; esac", Read),
+        ("case x in (x) {G};; esac", Read),
+        ("case x in (y) :;; (x) {G};; esac", Read),
+        ("case x in (y) :;& (x) {G};; esac", SomeRead(&[Bash5, Zsh])),
+        ("case x in\nx)\n  {G}\n  ;;\nesac", Read),
+        ("f(){ {G}; }; f", Read),
+        ("f() {\n  {G}\n}\nf", Read),
+        ("function f { {G}; }; f", Read),
+        ("function f() { {G}; }; f", Read),
+        ("f() ( {G} ); f", Read),
+        ("f(){ g(){ {G}; }; g; }; f", Read),
+        ("if true; then f(){ {G}; }; fi; f", Read),
+        ("f() {G}; f", SomeRead(&[Zsh])),
+        // A string a shell runs, handed on to another shell, and what that one reads.
+        ("bash -c \"bash -c '{G}'\"", Read),
+        ("sh -c \"eval '{G}'\"", Read),
+        ("bash -c 'case x in x) {G};; esac'", Read),
+        ("sh -c 'f(){ {G}; }; f'", Read),
+        ("eval 'echo \"$({G})\"'", Read),
+        ("bash <<'EOF'\nbash -c '{G}'\nEOF", Read),
+        ("bash <<'EOF'\nf(){ {G}; }; f\nEOF", Read),
+        // A commit or pull request body in `"$(cat <<'EOF' … EOF\n)"`: a quoted heredoc's body
+        // is text, code spans and all, unless a `)` in it ends the substitution early in
+        // GNU bash 3.2.57, after which a backtick in the double quotes runs.
+        (
+            "git commit -m \"$(cat <<'EOF'\nrefuses `f(){ {G}; }; f`\nEOF\n)\"",
+            Mention,
+        ),
+        (
+            "git commit -m \"$(cat <<'EOF'\nrefuses `case x in x) {G};; esac`\nEOF\n)\"",
+            Mention,
+        ),
+        (
+            "git commit -m \"$(cat <<'EOF'\nrefuses `echo \"$({G})\"`\nEOF\n)\"",
+            Mention,
+        ),
+        (
+            "gh pr create --title t --body \"$(cat <<'EOF'\n- refuses `f(){ {G}; }; f`\nEOF\n)\"",
+            Mention,
+        ),
+        ("echo \"$(cat <<'EOF'\n`f(){ {G}; }; f`\nEOF\n)\"", Mention),
+        (
+            "echo \"$(cat <<'EOF'\nfix a)\n`{G}`\nEOF\n)\"",
+            SomeRead(&[Bash3]),
+        ),
+        // A string handed to a shell from inside a substitution: the walk all three backstops
+        // share reads it (#1426).
+        ("echo \"$(bash -c '{G}')\"", Read),
+        ("echo \"$(bash -c \"sh -c '{G}'\")\"", Read),
+        ("echo \"$(bash -c 'echo {G}')\"", Mention),
+        ("bash -c \"echo \\$({G})\"", Read),
+        ("f(){ bash -c \"sh -c '{G}'\"; }; f", Read),
+        // Mentions.
+        ("f(){ echo {G}; }; f", Mention),
+        ("case x in x) echo {G};; esac", Mention),
+        ("bash -c \"echo '{G}'\"", Mention),
+        ("bash -c \"bash -c 'echo {G}'\"", Mention),
+        ("cat > s.sh <<EOF\nf() { {G}; }\nf\nEOF", Mention),
+        ("cat > s.sh <<'EOF'\ncase x in x) {G};; esac\nEOF", Mention),
+        // A script a reader writes to a file, inside a string a shell runs, at the first level
+        // and further in: refused as the consent and operator-rule backstops refuse it (#1426).
+        ("bash -c \"cat > s.sh <<'E'\n{G}\nE\"", OverRead),
+        (
+            "bash -c \"bash -c \\\"cat > s.sh <<'E'\n{G}\nE\\\"\"",
+            OverRead,
+        ),
+    ]
+    .into_iter()
+    .map(|(s, shells)| (s.to_string(), shells))
+    .collect();
+    // `bash -c '…'` around `bash -c '…'`, as deep as the cap: the quotes alternate, and an
+    // inner single quote is spelt `'\''`.
+    for depth in 1..=guardcaps::MAX_NESTING {
+        out.push((shell_string_nested("{G}", depth), Read));
+        out.push((shell_string_nested("echo {G}", depth), Mention));
+    }
+    out
+}
+
+/// Whether `shape` is a commit or pull request body in `"$(cat <<'EOF' … EOF\n)"` that no shell
+/// runs a line of. The consent and operator-rule backstops over-read one ([`OverRead`]); for a
+/// handoff the handoff guard's line reading reads it as the text it is, and
+/// [`handoff_shapes`] holds those rows as mentions.
+fn a_body_read_as_text(shape: &str) -> bool {
+    shape.contains("$(cat <<'EOF'\n") && !shape.contains("fix a)")
+}
+
+/// `inner` handed to `bash -c` `depth` times, each level single-quoted.
+fn shell_string_nested(inner: &str, depth: usize) -> String {
+    shell_string_nested_by(inner, depth, &["bash -c"])
+}
+
+/// `inner` handed `depth` times to the runners in `by`, taken in turn from the innermost out,
+/// each level single-quoted.
+fn shell_string_nested_by(inner: &str, depth: usize, by: &[&str]) -> String {
+    (0..depth).fold(inner.to_string(), |s, k| {
+        format!("{} '{}'", by[k % by.len()], s.replace('\'', "'\\''"))
+    })
+}
+
+/// Whether a zsh is installed where the shells look for one, so a shape that hands a string to
+/// `zsh -c` can run here.
+fn has_zsh() -> bool {
+    ["/bin/zsh", "/usr/bin/zsh"]
+        .iter()
+        .any(|p| Path::new(p).is_file())
+}
+
+/// A string a shell runs that hands another string to another shell, as deep as the cap, under
+/// every runner a shell is handed a string by (`bash -c`, `sh -c`, `zsh -c`, `eval`, `env bash
+/// -c`): the consent and operator-rule backstops read every level of it (#1426), as the handoff
+/// guard does (#1419).
+fn nested_shell_shapes() -> Vec<(String, Shells)> {
+    let mut out: Vec<(String, Shells)> = [
+        ("bash -c \"bash -c '{G}'\"", Read),
+        ("sh -c \"sh -c '{G}'\"", Read),
+        ("bash -c \"sh -c '{G}'\"", Read),
+        ("sh -c \"eval '{G}'\"", Read),
+        ("eval \"eval '{G}'\"", Read),
+        ("eval \"bash -c '{G}'\"", Read),
+        ("env bash -c \"bash -c '{G}'\"", Read),
+        ("bash -c \"env sh -c '{G}'\"", Read),
+        ("env bash -c \"env bash -c '{G}'\"", Read),
+        ("bash -c \"bash -c 'case x in x) {G};; esac'\"", Read),
+        ("bash -c \"sh -c 'f(){ {G}; }; f'\"", Read),
+        ("bash <<'EOF'\nbash -c \"bash -c '{G}'\"\nEOF", Read),
+        ("bash <<'EOF'\neval \"sh -c '{G}'\"\nEOF", Read),
+        ("bash -c \"bash <<'EOF'\n{G}\nEOF\"", Read),
+        // A string handed to a shell from inside a substitution, at either level.
+        ("echo \"$(bash -c '{G}')\"", Read),
+        ("bash -c 'echo \"$(sh -c \"{G}\")\"'", Read),
+        ("echo \"$(bash -c \"bash -c '{G}'\")\"", Read),
+        // …and from a function body or a `case` branch.
+        ("f(){ bash -c '{G}'; }; f", Read),
+        ("f(){ bash -c \"sh -c '{G}'\"; }; f", Read),
+        ("case x in x) bash -c '{G}';; esac", Read),
+        // Inside double quotes a shell drops the backslash in front of a `$` or a backtick,
+        // so the string it hands on runs the substitution.
+        ("bash -c \"echo \\$({G})\"", Read),
+        ("bash -c \"echo \\`{G}\\`\"", Read),
+        ("eval \"echo \\$({G})\"", Read),
+        ("env sh -c \"echo \\$({G})\"", Read),
+        ("bash -c 'eval \"echo \\\"\\$({G})\\\"\"'", Read),
+        ("echo \"$(bash -c \"echo \\$({G})\")\"", Read),
+        // …read the same in a `case` branch, at any level,
+        ("case x in x) bash -c \"echo \\$({G})\";; esac", Read),
+        ("case x in (x) eval \"echo \\$({G})\";; esac", Read),
+        (
+            "case x in y) :;; x) bash -c \"echo \\`{G}\\`\";; esac",
+            Read,
+        ),
+        (
+            "bash -c 'case x in x) sh -c \"echo \\$({G})\";; esac'",
+            Read,
+        ),
+        (
+            "bash <<'EOF'\ncase x in x) bash -c \"echo \\$({G})\";; esac\nEOF",
+            Read,
+        ),
+        // in a command the lexer cannot read whole,
+        ("bash -c \"echo \\$({G})\" <<'E'\nit's\nE", Read),
+        ("cat <<E\nit's\nE\nbash -c \"echo \\$({G})\"", Read),
+        // and in a word that joins an ANSI-C part to a double-quoted one.
+        ("bash -c $''\"echo \\$({G})\"", Read),
+        ("bash -c \"echo \\$({G})\"$''", Read),
+        ("bash -c $'echo '\"\\$({G})\"", Read),
+        ("eval $''\"echo \\$({G})\"", Read),
+        ("bash -c $''\"echo \\`{G}\\`\"", Read),
+        // A heredoc whose delimiter is unquoted is expanded the same way before the shell it
+        // feeds reads it.
+        ("bash <<EOF\necho \\$({G})\nEOF", Read),
+        ("sh <<EOF\necho \\`{G}\\`\nEOF", Read),
+        ("cat <<EOF | bash\necho \\$({G})\nEOF", Read),
+        ("bash -c \"sh <<E\necho \\\\\\$({G})\nE\"", Read),
+        ("bash <<EOF\nsh -c \"echo \\\\\\$({G})\"\nEOF", Read),
+        ("bash <<'EOF'\necho \\$({G})\nEOF", Mention),
+        ("bash <<EOF\necho \\\\\\$({G})\nEOF", Mention),
+        // A commit body GNU bash 3.2.57 runs a code span of, past an unmatched `)`
+        // in the body, the span handing a string on.
+        (
+            "echo \"$(cat <<'EOF'\nfix a)\n`bash -c 'sh -c \"{G}\"'`\nEOF\n)\"",
+            SomeRead(&[Bash3]),
+        ),
+        // In single quotes the backslash stays, and the shell handed the string runs nothing.
+        ("bash -c 'echo \\$({G})'", Mention),
+        ("eval 'echo \\`{G}\\`'", Mention),
+        // A shell's grammar corner, one string in: the shell running the `eval` decides.
+        (
+            "eval \"eval 'case x in (y) :;& (x) {G};; esac'\"",
+            SomeRead(&[Bash5, Zsh]),
+        ),
+        ("eval \"eval 'f() {G}; f'\"", SomeRead(&[Zsh])),
+        // Mentions.
+        ("bash -c \"bash -c 'echo {G}'\"", Mention),
+        ("eval \"eval 'echo {G}'\"", Mention),
+        ("env bash -c \"sh -c 'echo {G}'\"", Mention),
+        ("bash -c \"bash -c 'f(){ echo {G}; }; f'\"", Mention),
+        // A script a reader writes to a file, inside a string a shell runs: no shell runs it,
+        // and all three backstops refuse it alike, as the handoff guard's first level always
+        // has (#1426). The safe side; whether to read it as data is a ruling's.
+        ("bash -c \"cat > s.sh <<'E'\n{G}\nE\"", OverRead),
+        (
+            "bash -c \"bash -c \\\"cat > s.sh <<'E'\n{G}\nE\\\"\"",
+            OverRead,
+        ),
+    ]
+    .into_iter()
+    .map(|(s, shells)| (s.to_string(), shells))
+    .collect();
+    let mut runners = vec!["bash -c", "sh -c", "eval", "env bash -c"];
+    if has_zsh() {
+        out.push(("zsh -c \"zsh -c '{G}'\"".to_string(), Read));
+        out.push(("bash -c \"zsh -c '{G}'\"".to_string(), Read));
+        out.push(("zsh -c \"zsh -c 'echo {G}'\"".to_string(), Mention));
+        runners.push("zsh -c");
+    }
+    for depth in 1..=guardcaps::MAX_NESTING {
+        out.push((shell_string_nested_by("{G}", depth, &runners), Read));
+        out.push((shell_string_nested_by("echo {G}", depth, &runners), Mention));
+    }
+    out
+}
+
+/// A script a shell is handed some other way than as a `-c` string or a heredoc (#1426): on
+/// its stdin from a pipe or a here-string, as `/dev/stdin` or a process substitution it reads as
+/// a file, and as the command of a `find -exec`. Every backstop reads each.
+fn stdin_script_shapes() -> Vec<(String, Shells)> {
+    [
+        // A pipe into a shell that reads its script from stdin.
+        ("echo '{G}' | bash", Read),
+        ("echo '{G}' | bash -s", Read),
+        ("printf '%s\\n' '{G}' | sh", Read),
+        ("echo '{G}' | env sh", Read),
+        ("echo '{G}' | cat | bash", Read),
+        ("{ echo '{G}'; } | bash", Read),
+        ("(echo '{G}') | sh", Read),
+        ("echo '{G}' | bash /dev/stdin", Read),
+        ("bash -c \"echo '{G}' | sh\"", Read),
+        ("echo \"$(echo '{G}' | sh)\"", Read),
+        // A here-string.
+        ("bash <<< '{G}'", Read),
+        ("bash -s <<< '{G}'", Read),
+        ("bash <<< \"sh -c '{G}'\"", Read),
+        ("bash -c \"sh\" <<< '{G}'", Read),
+        ("bash -c \"bash <<< '{G}'\"", Read),
+        // `source` and `.` reading stdin as a file.
+        ("source /dev/stdin <<'EOF'\n{G}\nEOF", Read),
+        (". /dev/stdin <<< '{G}'", Read),
+        ("echo '{G}' | . /dev/stdin", Read),
+        // A process substitution read as the script.
+        ("bash <(echo '{G}')", Read),
+        ("bash < <(echo '{G}')", Read),
+        // (`source <( … )` is read the same way. GNU bash 3.2.57 runs it or not by timing, so
+        // it has no row.)
+        // The command a `find -exec` runs.
+        ("find . -maxdepth 0 -exec sh -c '{G}' \\;", Read),
+        ("find . -maxdepth 0 -exec sh -c '{G}' sh {} +", Read),
+        ("find . -maxdepth 0 -exec {G} \\;", Read),
+        (
+            "bash -c \"find . -maxdepth 0 -exec sh -c '{G}' \\\\;\"",
+            Read,
+        ),
+        // Mentions: the text reaches no shell as a script.
+        ("echo '{G}' | cat", Mention),
+        ("echo '{G}' | bash -c 'cat'", Mention),
+        ("cat <<< '{G}'", Mention),
+        ("echo '{G}'; bash -c 'true'", Mention),
+        ("diff <(echo '{G}') <(echo '{G}')", Mention),
+        ("find . -maxdepth 0 -exec echo {G} \\;", Mention),
+        ("find . -maxdepth 0 -name '{G}'", Mention),
+    ]
+    .into_iter()
+    .map(|(s, shells)| (s.to_string(), shells))
+    .collect()
+}
+
 /// Runs every [`gated_shapes`] shape `shapes` keeps for each gated command in `gated` through
 /// the shells and through `judge`, and answers every disagreement: a shape a shell runs the command with must be
 /// refused, and a mention let through.
 fn disagreements(
+    gated: &[&str],
+    judge: &dyn Fn(&str) -> Option<String>,
+    shapes: impl Fn(&str) -> bool,
+) -> Vec<String> {
+    disagreements_over(gated_shapes(), gated, judge, shapes)
+}
+
+/// [`disagreements`] over the shapes `corpus` lists.
+fn disagreements_over(
+    corpus: Vec<(String, Shells)>,
     gated: &[&str],
     judge: &dyn Fn(&str) -> Option<String>,
     shapes: impl Fn(&str) -> bool,
@@ -541,7 +862,8 @@ fn disagreements(
     let kinds: Vec<Option<Shell>> = installed.iter().map(|shell| kind(shell)).collect();
     let mut wrong = Vec::new();
     for g in gated {
-        for (shape, expected) in gated_shapes().into_iter().filter(|(s, _)| shapes(s)) {
+        for (shape, expected) in corpus.iter().filter(|(s, _)| shapes(s)) {
+            let expected = *expected;
             let cmd = spell(&shape.replace("{G}", g), &f);
             let ran: Vec<bool> = installed
                 .iter()
@@ -553,7 +875,7 @@ fn disagreements(
                     .iter()
                     .zip(&ran)
                     .all(|(kind, &r)| kind.is_none_or(|kind| readers.contains(&kind) == r)),
-                Mention => !ran.iter().any(|&r| r),
+                Mention | OverRead => !ran.iter().any(|&r| r),
             };
             if !installed.is_empty() && !agrees {
                 wrong.push(format!(
@@ -584,7 +906,19 @@ fn every_shape_a_shell_runs_an_operators_ruled_command_with_is_refused_and_no_ot
         ".claude/settings.json",
         r#"{"permissions": {"ask": ["Bash(terraform apply *)"]}}"#,
     );
-    let wrong = disagreements(&["terraform apply x"], &|cmd| rules.refusal(cmd), |_| true);
+    let mut wrong = disagreements(&["terraform apply x"], &|cmd| rules.refusal(cmd), |_| true);
+    wrong.extend(disagreements_over(
+        nested_shell_shapes(),
+        &["terraform apply x"],
+        &|cmd| rules.refusal(cmd),
+        |_| true,
+    ));
+    wrong.extend(disagreements_over(
+        stdin_script_shapes(),
+        &["terraform apply x"],
+        &|cmd| rules.refusal(cmd),
+        |_| true,
+    ));
     assert!(wrong.is_empty(), "{}", wrong.join("\n"));
 }
 
@@ -601,9 +935,68 @@ fn every_shape_a_shell_runs_a_consent_gated_command_with_is_refused_at_every_dep
         &judge,
         |_| true,
     );
-    // A handoff in a substitution, which the handoff guard does not read there.
+    // A handoff in a substitution, which the handoff guard does not read there. A body GNU bash
+    // 3.2.57 runs as lines past an unmatched `)` is the handoff guard's (`handoff-shell-string`).
     wrong.extend(disagreements(&["charter handoff beta"], &judge, |shape| {
-        shape.contains("$(") || shape.contains('`')
+        (shape.contains("$(") || shape.contains('`'))
+            && !shape.contains("fix a)")
+            && !a_body_read_as_text(shape)
+    }));
+    // A string handed on to another shell, read at every level (#1426).
+    wrong.extend(disagreements_over(
+        nested_shell_shapes(),
+        &["purlis report bug --yes x", "charter report bug --yes x"],
+        &judge,
+        |_| true,
+    ));
+    wrong.extend(disagreements_over(
+        stdin_script_shapes(),
+        &["purlis report bug --yes x", "charter report bug --yes x"],
+        &judge,
+        |_| true,
+    ));
+    assert!(wrong.is_empty(), "{}", wrong.join("\n"));
+}
+
+/// A handoff in a `case` branch, a function body, or a string a shell hands another shell is
+/// the handoff guard's to refuse, and every shape a shell runs one with is refused by it alone
+/// (#1419). Over the shapes every backstop reads, a handoff in a substitution is the consent
+/// backstop's (D-1417-5): between them, every shape is refused and no mention.
+#[test]
+fn every_shape_a_shell_runs_a_handoff_with_is_refused_and_no_other() {
+    purlis_core::unsteered!();
+    use purlis_core::handoffguard::{self, Caller};
+    let a7 = |cmd: &str| {
+        handoffguard::handoff_refusal(
+            cmd,
+            Caller {
+                agent_id: None,
+                harness: Some("claude-code"),
+                permission_mode: Some("default"),
+            },
+        )
+        .map(|(_, why)| why)
+    };
+    let project = tempfile::tempdir().expect("a project");
+    let both = |cmd: &str| {
+        a7(cmd).or_else(|| {
+            purlis_core::consentspelling::refusal(cmd, project.path(), &[project.path()])
+        })
+    };
+    let handoff = ["charter handoff beta"];
+    let mut wrong = disagreements_over(handoff_shapes(), &handoff, &a7, |_| true);
+    wrong.extend(disagreements_over(
+        stdin_script_shapes(),
+        &handoff,
+        &a7,
+        |_| true,
+    ));
+    // A substitution in a comment inside a substitution runs nothing, and the handoff guard's
+    // line reading, which is the recorded Python's, still finds a handoff there: it refuses
+    // the mention, the side it errs on.
+    let over = "echo \"$(echo hi # $({G})\n)\"";
+    wrong.extend(disagreements(&handoff, &both, |shape| {
+        shape != over && !a_body_read_as_text(shape)
     }));
     assert!(wrong.is_empty(), "{}", wrong.join("\n"));
 }
@@ -631,6 +1024,67 @@ fn a_gated_command_nested_past_the_cap_is_refused_as_too_big_to_check() {
             refused.is_some() && too_deep,
             "rule, depth {depth}: {refused:?}"
         );
+    }
+    // The handoff guard walks nested strings the same way, past the cap too (#1426).
+    let a7 = |cmd: &str| {
+        purlis_core::handoffguard::handoff_refusal(
+            cmd,
+            purlis_core::handoffguard::Caller {
+                agent_id: None,
+                harness: Some("claude-code"),
+                permission_mode: Some("default"),
+            },
+        )
+    };
+    for by in [&["bash -c"][..], &["eval", "sh -c"]] {
+        for inner in [
+            "charter handoff beta",
+            "echo charter handoff beta",
+            "charter $'\\x68andoff' beta",
+            "ls",
+        ] {
+            let cmd = shell_string_nested_by(inner, guardcaps::MAX_NESTING + 1, by);
+            let (refused, too_deep) = shellseg::too_deep_within(|| a7(&cmd));
+            assert!(
+                refused.is_some() && too_deep,
+                "handoff, {by:?}: {cmd:?}: {refused:?}"
+            );
+        }
+    }
+    // A string handed on to another shell past the cap, whatever it holds, mention or not
+    // (#1426), and refused with the sentence every guard says it with.
+    for depth in [guardcaps::MAX_NESTING + 1] {
+        for by in [&["bash -c"][..], &["eval"], &["sh -c", "env bash -c"]] {
+            for (consent, ruled) in [
+                ("purlis report bug --yes x", "terraform apply x"),
+                ("echo purlis report bug --yes x", "echo terraform apply x"),
+                // A name a reading of words would not find: refused all the same, unread.
+                (
+                    "$'\\x70urlis' report bug --yes x",
+                    "$'\\x74erraform' apply x",
+                ),
+                ("ls", "ls"),
+            ] {
+                let consent = shell_string_nested_by(consent, depth, by);
+                let (refused, too_deep) = shellseg::too_deep_within(|| {
+                    purlis_core::consentspelling::refusal(
+                        &consent,
+                        project.path(),
+                        &[project.path()],
+                    )
+                });
+                assert!(
+                    too_deep && refused == Some(guardcaps::too_deep_refusal()),
+                    "consent, {by:?} {depth} deep: {consent:?}: {refused:?}"
+                );
+                let ruled = shell_string_nested_by(ruled, depth, by);
+                let (refused, too_deep) = shellseg::too_deep_within(|| rules.refusal(&ruled));
+                assert!(
+                    too_deep && refused == Some(guardcaps::too_deep_refusal()),
+                    "rule, {by:?} {depth} deep: {ruled:?}: {refused:?}"
+                );
+            }
+        }
     }
 }
 
