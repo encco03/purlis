@@ -87,6 +87,30 @@ pub(crate) fn record_repeated(
     }
 }
 
+/// **Records a person's Keep blocked** of `target` for chat `session` in the project at `root`
+/// (#1700): their no to the ask, which grants nothing and so has no grant to list it. Only a
+/// host a grant could name is kept; a record that cannot be written is said in the log and
+/// changes nothing, since the chat was kept blocked either way.
+pub(crate) fn record_kept_blocked(
+    record: Option<&Record>,
+    root: &Path,
+    chats: &crate::chats::Chats,
+    session: u32,
+    target: &str,
+) {
+    let Some(record) = record else { return };
+    if purlis_core::sandboxblock::named_host(target).is_none() {
+        return;
+    }
+    let (chat, persona) = chat_of(chats, session);
+    let entry = Entry::kept_blocked(target, chat, persona.as_deref(), now_secs());
+    if let Err(why) = record.write(root, &entry) {
+        tracing::warn!(
+            "purlis: a Keep blocked of chat {session} was not kept in the network record ({why})"
+        );
+    }
+}
+
 /// Connections purlis's own proxy carried for one chat, as its tally told them (#1664).
 pub(crate) struct Connections<'a> {
     /// The chat's number: the one whose proxy it came in on.
@@ -610,6 +634,51 @@ pub fn chat_network(
     ))
 }
 
+/// One **Keep blocked** a person answered here (#1700): what the Inbox's look back lists beside
+/// what was allowed, since a no leaves no grant behind.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, specta::Type)]
+pub struct KeptBlocked {
+    /// The host and port kept blocked, as a grant names it.
+    pub target: String,
+    /// The chat it was kept blocked for, by the name it was shown under, where the record has it.
+    pub chat: Option<String>,
+    /// When, in seconds since 1970.
+    pub at: u32,
+}
+
+/// The Keep blocked answers among `entries`, newest first, at most [`AT_MOST_LISTED`].
+fn kept_blocked_of(entries: &[Entry]) -> Vec<KeptBlocked> {
+    entries
+        .iter()
+        .rev()
+        .filter(|entry| entry.is_kept_blocked())
+        .filter_map(|entry| {
+            Some(KeptBlocked {
+                target: entry.target.clone()?,
+                chat: entry.chat.name.clone(),
+                at: u32::try_from(entry.at).unwrap_or(u32::MAX),
+            })
+        })
+        .take(AT_MOST_LISTED)
+        .collect()
+}
+
+/// **What the person kept blocked here** (#1700), from this machine's network record, newest
+/// first: the window's alone (`WINDOW_ONLY`).
+#[tauri::command]
+#[specta::specta]
+pub fn sandbox_kept_blocked(
+    planes: tauri::State<'_, Planes>,
+    plane: PlaneId,
+) -> Result<Vec<KeptBlocked>, String> {
+    let held = planes.held(&plane)?;
+    let entries = planes
+        .network()
+        .map(|record| record.read(held.root(), now_secs()))
+        .unwrap_or_default();
+    Ok(kept_blocked_of(&entries))
+}
+
 /// **Allow on Blocked lately** in the project at `root` (#1662): `host`, judged by the core as a
 /// block's Allow is (never the window's word, never past a policy lock), then audited and kept
 /// by the same path a block's Notice keeps it by (`sandboxing::kept_for`), for this project on
@@ -693,3 +762,7 @@ pub fn allow_blocked_host(
 #[cfg(test)]
 #[path = "network_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "network_kept_tests.rs"]
+mod kept_tests;

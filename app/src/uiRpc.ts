@@ -4389,6 +4389,19 @@ export type Kept =
 "missing";
 
 /**
+ *  One **Keep blocked** a person answered here (#1700): what the Inbox's look back lists beside
+ *  what was allowed, since a no leaves no grant behind.
+ */
+export type KeptBlocked = {
+	/**  The host and port kept blocked, as a grant names it. */
+	target: string,
+	/**  The chat it was kept blocked for, by the name it was shown under, where the record has it. */
+	chat: string | null,
+	/**  When, in seconds since 1970. */
+	at: number,
+};
+
+/**
  *  What a Land would do, before it does any of it: the request, the head its checks passed at,
  *  and how it lands. Handed back whole by the yes.
  */

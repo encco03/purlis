@@ -6,12 +6,17 @@
  * whole. Only what was granted on this machine (a grant a teammate committed has its `by`), and
  * only what says when. Every name in it is drawn safely (`sandboxBlocks.inertly`, I-1): a chat
  * named the folder or host it was allowed.
+ *
+ * **And the person's Keep blocked answers** (#1700): a no grants nothing, so no grant lists it;
+ * the network record keeps each one (`sandbox_kept_blocked`), and it is listed here beside the
+ * Allows, so the look back shows both answers a host ask has.
  */
 import { useEffect, useState } from "react";
 import {
   commands,
   type DispatchGrant,
   type GrantLevel,
+  type KeptBlocked,
   type PlaneId,
   type SandboxGrant,
 } from "./bindings";
@@ -72,13 +77,25 @@ function ofDispatch(grant: DispatchGrant): AllowedLately | undefined {
   };
 }
 
-/** **The grants of the last day, newest first**, from what the two sources answered. */
+function ofKept(kept: KeptBlocked): AllowedLately {
+  return {
+    key: `kept:${kept.at}:${kept.target}:${kept.chat ?? ""}`,
+    at: kept.at * 1000,
+    chat: kept.chat === null ? null : inertly(kept.chat),
+    says: `Kept ${inertly(kept.target)} blocked`,
+    level: FOR.chat,
+  };
+}
+
+/** **The answers of the last day, newest first**, from what the sources answered: the grants,
+ *  and the Keep blocked answers the network record keeps. */
 export function lately(
   sandbox: readonly SandboxGrant[],
   dispatch: readonly DispatchGrant[],
   now: number,
+  kept: readonly KeptBlocked[] = [],
 ): AllowedLately[] {
-  return [...sandbox.map(ofSandbox), ...dispatch.map(ofDispatch)]
+  return [...sandbox.map(ofSandbox), ...dispatch.map(ofDispatch), ...kept.map(ofKept)]
     .filter((one): one is AllowedLately => one !== undefined && now - one.at < LATELY_MS)
     .sort((one, other) => other.at - one.at || one.key.localeCompare(other.key))
     .slice(0, MOST_LATELY);
@@ -97,16 +114,19 @@ export function useAllowedLately(plane: PlaneId, reading: boolean): readonly All
     void Promise.all([
       commands.sandboxGrants(plane).catch(() => ({ status: "error" as const })),
       commands.dispatchGrants(plane).catch(() => ({ status: "error" as const })),
-    ]).then(([sandbox, dispatch]) => {
+      commands.sandboxKeptBlocked(plane).catch(() => ({ status: "error" as const })),
+    ]).then(([sandbox, dispatch, keptBlocked]) => {
       if (gone) return;
       const grants = sandbox.status === "ok" ? sandbox.data : undefined;
       const dispatched = dispatch.status === "ok" ? dispatch.data : undefined;
+      const kept = keptBlocked.status === "ok" ? keptBlocked.data : undefined;
       setListed({
         plane,
         list: lately(
           Array.isArray(grants) ? grants : [],
           Array.isArray(dispatched?.grants) ? dispatched.grants : [],
           now(),
+          Array.isArray(kept) ? kept : [],
         ),
       });
     });

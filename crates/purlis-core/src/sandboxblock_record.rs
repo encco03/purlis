@@ -360,6 +360,33 @@ impl Entry {
         }
     }
 
+    /// **A person kept `target` blocked** for chat `chat` (as persona `persona`), from the
+    /// window, at `at` (#1700): their no to an ask, in the words the record has already, an
+    /// [`Event::Ask`] [`Outcome::Refused`] that `you` decided, for that chat. Nothing is granted,
+    /// and a reader of Blocks never counts it: the Block it answered has its own line.
+    pub fn kept_blocked(target: &str, chat: Chat, persona: Option<&str>, at: u64) -> Self {
+        Self {
+            at,
+            event: Event::Ask,
+            block: None,
+            what: Some(What::Host),
+            target: super::named_host(target),
+            looked_up: None,
+            chat,
+            persona: persona.map(str::to_owned),
+            scope: Some(Scope::Chat),
+            who: Some(Who::You),
+            outcome: Outcome::Refused,
+            times: None,
+        }
+    }
+
+    /// Whether it is a person's Keep blocked ([`Self::kept_blocked`]).
+    pub fn is_kept_blocked(&self) -> bool {
+        (self.event, self.outcome, self.who) == (Event::Ask, Outcome::Refused, Some(Who::You))
+            && self.target.is_some()
+    }
+
     /// Whether it is a Block of a connection to a host: what Blocked lately lists.
     pub fn is_host_block(&self) -> bool {
         self.event == Event::Block
