@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791726913082,
+  "lastUpdate": 1791731560481,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7644,6 +7644,48 @@ window.BENCHMARK_DATA = {
             "value": 104.540732,
             "unit": "ms",
             "extra": "median of 5 runs: 103.666, 104.534, 104.541, 105.001, 106.764 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "bb9b8cc3c38daca84eeeedeb3c982d5750fddd7e",
+          "message": "change store: a store that cannot be held answers exists as its path does\n\nexists answered yes for any changes/ it could not hold, so change create\nthrough a changes/ linked out of the project said the change already\nexists (exit 2) instead of refusing the link (exit 1), which\npurlis-cli's change test holds. It now answers as the look by path\nanswered: that reads nothing, and the read or write that follows still\ngoes through the hold and is refused in its own words.\n\nRefs #1083\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T19:05:18+04:00",
+          "tree_id": "a5d137a508b1f900a991622be4d169a70d665227",
+          "url": "https://github.com/purlis/purlis/commit/bb9b8cc3c38daca84eeeedeb3c982d5750fddd7e"
+        },
+        "date": 1791731559758,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.3576695,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.348, 0.349, 0.358, 0.358, 0.362 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.454271,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.382, 16.404, 16.454, 16.581, 16.621 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.563909,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.501, 101.552, 101.564, 102.006, 102.969 ms"
           }
         ]
       }
