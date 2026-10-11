@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791753190495,
+  "lastUpdate": 1791754695080,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7896,6 +7896,48 @@ window.BENCHMARK_DATA = {
             "value": 100.741389,
             "unit": "ms",
             "extra": "median of 5 runs: 99.948, 100.510, 100.741, 101.164, 101.284 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "489bdbf795568f19eb831f1c224693a890a52e23",
+          "message": "ci: run the macOS scenario part's single-app runs in part 2, the shorter one\n\nOn #1780 part 1 (its half of the specs, panes' fifty sessions among them, and the five runs\nthat each need an app of their own) took 13 minutes and part 2 took 7. The five runs, about\ntwo minutes on macOS, move to part 2.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T01:06:58+04:00",
+          "tree_id": "7701e1f159f8a3c561dae12b2eb4203da480a92a",
+          "url": "https://github.com/purlis/purlis/commit/489bdbf795568f19eb831f1c224693a890a52e23"
+        },
+        "date": 1791754694088,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5201260000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.493, 0.510, 0.520, 0.520, 0.541 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.174665,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.848, 17.116, 17.175, 17.194, 17.248 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.75309899999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.920, 104.604, 104.753, 105.365, 106.016 ms"
           }
         ]
       }
