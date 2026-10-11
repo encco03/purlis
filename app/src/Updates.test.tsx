@@ -160,6 +160,29 @@ describe("the update button", () => {
     expect(restarted).toBe(1);
   });
 
+  it("restarts with what to put back answered, so the next launch asks nothing (#1078)", async () => {
+    const restarted: unknown[] = [];
+    render(
+      <UpdateItem
+        updates={updates(
+          { kind: "installed", version: "0.2.0" },
+          { restart: (after) => restarted.push(after) },
+        )}
+        chats={[chat("ide.1", "done")]}
+      />,
+    );
+
+    await userEvent.click(button());
+    const dialog = await screen.findByRole("dialog");
+    const after = within(dialog).getByRole("radiogroup", { name: "After the restart" });
+    // Every chat put back is the answer in front, as the launch's own question has it.
+    expect(within(after).getByRole("radio", { name: "Reopen every chat" })).toBeChecked();
+    await userEvent.click(within(after).getByRole("radio", { name: "Start fresh" }));
+    await userEvent.click(within(dialog).getByRole("button", { name: "Restart to update" }));
+
+    expect(restarted).toEqual(["StartFresh"]);
+  });
+
   it("names each chat that is mid-turn and waits when asked to", async () => {
     let restarted = 0;
     render(
@@ -483,6 +506,30 @@ describe("useUpdates", () => {
       version: "0.2.0",
       refused: "no update has been installed",
     });
+  });
+
+  it("carries what to put back to the core with the restart (#1078)", async () => {
+    clearMocks();
+    const told: unknown[] = [];
+    mockIPC(
+      (cmd, args) => {
+        asked.push(cmd);
+        if (cmd === "update_channel") return "stable";
+        if (cmd === "restart_to_update_choosing") told.push(args);
+        return null;
+      },
+      { shouldMockEvents: true },
+    );
+    const { result } = await mounted();
+    await act(() => emit("update://installed", "0.2.0"));
+
+    await act(async () => {
+      result.current.restart("StartFresh");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(told).toEqual([{ choice: "StartFresh" }]);
+    expect(asked).not.toContain("restart_to_update");
   });
 
   it("drops an offer from the old channel when the channel changes, and looks again", async () => {

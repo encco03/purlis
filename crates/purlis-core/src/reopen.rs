@@ -660,6 +660,64 @@ pub fn mark_restart_to_update(config_root: &Path) -> std::io::Result<()> {
     crate::contain::create_no_link(&dir, &dir.join(RESTARTED_TO_UPDATE)).map(drop)
 }
 
+/// [`mark_restart_to_update`], carrying what the person answered before the restart: put every
+/// chat back, or start fresh (#1078). The launch after the restart takes that answer
+/// ([`take_restart`]) and does not ask "Reopen your sessions?" again.
+///
+/// **One word in the marker, which nothing before #1078 reads**: `reopen-all` or
+/// `start-fresh`, then a newline. A build that only asks whether the marker is there reads it
+/// as it always did, and asks.
+pub fn mark_restart_to_update_choosing(
+    config_root: &Path,
+    choice: Option<Choice>,
+) -> std::io::Result<()> {
+    use std::io::Write as _;
+    let dir = crate::machine::private_dir(config_root)?;
+    let mut file = crate::contain::create_no_link(&dir, &dir.join(RESTARTED_TO_UPDATE))?;
+    if let Some(choice) = choice {
+        file.write_all(format!("{}\n", restart_word(choice)).as_bytes())?;
+    }
+    Ok(())
+}
+
+/// The word [`mark_restart_to_update_choosing`] writes for `choice`.
+fn restart_word(choice: Choice) -> &'static str {
+    match choice {
+        Choice::ReopenAll => "reopen-all",
+        Choice::StartFresh => "start-fresh",
+    }
+}
+
+/// What a restart to update left for the launch after it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Restarted {
+    /// What the person answered before the restart, where they did: the launch takes it as
+    /// the answer to its question and does not ask. `None` is a restart that asked nothing,
+    /// or a word this build does not read, and the launch asks as it always has.
+    pub chosen: Option<Choice>,
+}
+
+/// [`take_restart_to_update`], with the answer the restart carried: `None` when no restart
+/// came before this launch, read once and removed as it is read. A marker that cannot be
+/// read whole carries no answer; one that cannot be removed is no restart, for
+/// [`take_restart_to_update`]'s reason.
+pub fn take_restart(config_root: &Path) -> Option<Restarted> {
+    use std::io::Read as _;
+    let dir = crate::machine::dir(config_root);
+    let marker = dir.join(RESTARTED_TO_UPDATE);
+    let mut said = String::new();
+    let read = crate::contain::open_no_link(&dir, &marker)
+        .and_then(|file| file.take(64).read_to_string(&mut said));
+    std::fs::remove_file(&marker).ok()?;
+    let word = said.trim();
+    let chosen = read.ok().and_then(|_| {
+        [Choice::ReopenAll, Choice::StartFresh]
+            .into_iter()
+            .find(|choice| restart_word(*choice) == word)
+    });
+    Some(Restarted { chosen })
+}
+
 /// Whether this launch follows a restart to update, answered once: the marker is removed as
 /// it is read, so no later launch reads it too.
 ///
@@ -667,7 +725,7 @@ pub fn mark_restart_to_update(config_root: &Path) -> std::io::Result<()> {
 /// question is being asked. A marker that cannot be removed is also "no" — one that stayed
 /// would say "restarted" at every launch after this one.
 pub fn take_restart_to_update(config_root: &Path) -> bool {
-    std::fs::remove_file(crate::machine::dir(config_root).join(RESTARTED_TO_UPDATE)).is_ok()
+    take_restart(config_root).is_some()
 }
 
 /// How a chat came back, which is what the pane showing it says.
@@ -4304,6 +4362,45 @@ pub(crate) mod tests {
         assert!(
             !take_restart_to_update(config.path()),
             "the launch after it"
+        );
+    }
+
+    #[test]
+    fn a_restart_that_was_told_what_to_put_back_says_so_once() {
+        // #1078: the answer given before the restart is the next launch's, so it asks nothing.
+        for choice in [Choice::ReopenAll, Choice::StartFresh] {
+            let config = tempfile::tempdir().unwrap();
+            mark_restart_to_update_choosing(config.path(), Some(choice)).unwrap();
+
+            assert_eq!(
+                take_restart(config.path()),
+                Some(Restarted {
+                    chosen: Some(choice)
+                })
+            );
+            assert_eq!(take_restart(config.path()), None, "the launch after it");
+        }
+    }
+
+    #[test]
+    fn a_restart_marker_with_no_answer_or_one_this_build_cannot_read_still_asks() {
+        let config = tempfile::tempdir().unwrap();
+        // What a build before #1078 leaves: the file, and nothing in it.
+        mark_restart_to_update(config.path()).unwrap();
+        assert_eq!(
+            take_restart(config.path()),
+            Some(Restarted { chosen: None })
+        );
+        // A word a later build might write is no answer here: the question is asked.
+        mark_restart_to_update(config.path()).unwrap();
+        fs::write(
+            crate::machine::dir(config.path()).join(RESTARTED_TO_UPDATE),
+            "reopen-some\n",
+        )
+        .unwrap();
+        assert_eq!(
+            take_restart(config.path()),
+            Some(Restarted { chosen: None })
         );
     }
 

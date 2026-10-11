@@ -465,8 +465,34 @@ fn restarting(
     planes: &crate::planes::Planes,
     restart: impl FnOnce(),
 ) -> Result<(), String> {
+    restarting_choosing(installed, planes, None, restart)
+}
+
+/// **Restart to update, with what to put back already answered** (#1078): the window's
+/// update dialog asks it before the restart, so the launch after it asks nothing. Otherwise
+/// [`restart_to_update`].
+#[tauri::command]
+#[specta::specta]
+pub fn restart_to_update_choosing(
+    app: tauri::AppHandle,
+    installed: tauri::State<'_, Installed>,
+    planes: tauri::State<'_, crate::planes::Planes>,
+    choice: crate::opener::RelaunchChoice,
+) -> Result<(), String> {
+    restarting_choosing(&installed, &planes, Some(choice.into()), || {
+        app.request_restart()
+    })
+}
+
+/// [`restarting`], carrying `chosen` to the launch after the restart.
+fn restarting_choosing(
+    installed: &Installed,
+    planes: &crate::planes::Planes,
+    chosen: Option<purlis_core::reopen::Choice>,
+    restart: impl FnOnce(),
+) -> Result<(), String> {
     installed.ready()?;
-    planes.let_go_of_all_to_update();
+    planes.let_go_of_all_to_update_choosing(chosen);
     restart();
     Ok(())
 }

@@ -516,8 +516,10 @@ describe("what a keyboard reaches in the window's modal surfaces", () => {
     await userEvent.click(screen.getByTestId("status-update"));
     await screen.findByRole("dialog");
 
+    // What to put back after the restart is answered here, one stop like the channel (#1078).
     expect(await reachableByKeyboard()).toEqual([
       'radio "stable"',
+      'radio "Reopen every chat"',
       'button "Close"',
       'button "Restart to update"',
     ]);

@@ -185,6 +185,7 @@ pub const WINDOW_ONLY: &[&str] = &[
     "forget_project",
     "restart_on_the_session_bus",
     "restart_to_update",
+    "restart_to_update_choosing",
     // Starts.
     "ask_persona_chat",
     "start_chat",

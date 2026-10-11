@@ -233,9 +233,11 @@ async fn answering_an_ask_is_never_served_on_the_link_even_to_the_window() {
     for command in ["project_harness_declarations", "open_harness_declaration"] {
         assert!(ui::WINDOW_ONLY.contains(&command), "{command}");
     }
+    // And Restart to update with what to put back already answered (#1078).
+    assert!(ui::WINDOW_ONLY.contains(&"restart_to_update_choosing"));
     assert_eq!(
         ui::WINDOW_ONLY.len(),
-        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2
+        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2 + 1
     );
 }
 
