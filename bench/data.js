@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791733876163,
+  "lastUpdate": 1791742090772,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7728,6 +7728,48 @@ window.BENCHMARK_DATA = {
             "value": 103.9491515,
             "unit": "ms",
             "extra": "median of 5 runs: 103.767, 103.924, 103.949, 104.218, 105.785 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "500e0d32517f7c0c05de5783d63ec43236368569",
+          "message": "ci: annotate each scenario job with its slowest spec files and tests\n\nThe scenario specs' own time doubled in a day as specs were added (Linux 313 s on 2026-10-10,\n587 s on 2026-10-11; 39 spec files then, 51 now), and they run one at a time in one app, so\nthe scenario jobs are again the longest wait. The scenario config's afterTest and a session's\nbeforeSession/afterSession write each test's and each spec file's time to\napp/logs/timings.jsonl (app/e2e/timings.ts, beside failures.ts); tools/e2e-timings.mjs ranks\nthem as two notices per job, as tools/slowest-tests.mjs does for the Rust suite. A report:\n!cancelled() and continue-on-error.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T21:22:19+04:00",
+          "tree_id": "9cff13b470d4d0d374720883d0b9ff9cae4efbe9",
+          "url": "https://github.com/purlis/purlis/commit/500e0d32517f7c0c05de5783d63ec43236368569"
+        },
+        "date": 1791742089105,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5144505,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.489, 0.503, 0.514, 0.519, 0.526 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.759681,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.318, 16.715, 16.760, 17.118, 17.452 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.384705,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.457, 103.138, 104.385, 105.643, 105.905 ms"
           }
         ]
       }
