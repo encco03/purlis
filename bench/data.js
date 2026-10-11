@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791751258127,
+  "lastUpdate": 1791753190495,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7854,6 +7854,48 @@ window.BENCHMARK_DATA = {
             "value": 103.18790999999999,
             "unit": "ms",
             "extra": "median of 5 runs: 101.896, 102.104, 103.188, 103.685, 104.227 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "76be501433819bb1e57f27fbef3fd89575bc2552",
+          "message": "Bump github/codeql-action/upload-sarif\n\nBumps the actions group with 1 update in the / directory: [github/codeql-action/upload-sarif](https://github.com/github/codeql-action).\n\n\nUpdates `github/codeql-action/upload-sarif` from 4.38.2 to 4.38.3\n- [Release notes](https://github.com/github/codeql-action/releases)\n- [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/github/codeql-action/compare/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2...24c54180a607b1449ed407dd24f251e4e9147c8d)\n\n---\nupdated-dependencies:\n- dependency-name: github/codeql-action/upload-sarif\n  dependency-version: 4.38.3\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: actions\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2026-10-12T00:42:42+04:00",
+          "tree_id": "a225477fce82e6118bb835fc3bb16ff4a1ab521f",
+          "url": "https://github.com/purlis/purlis/commit/76be501433819bb1e57f27fbef3fd89575bc2552"
+        },
+        "date": 1791753189302,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.26684450000000004,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.263, 0.264, 0.267, 0.267, 0.273 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.4611665,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.350, 16.407, 16.461, 16.471, 16.498 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 100.741389,
+            "unit": "ms",
+            "extra": "median of 5 runs: 99.948, 100.510, 100.741, 101.164, 101.284 ms"
           }
         ]
       }
