@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791703930163,
+  "lastUpdate": 1791705103548,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7224,6 +7224,48 @@ window.BENCHMARK_DATA = {
             "value": 105.3192885,
             "unit": "ms",
             "extra": "median of 5 runs: 102.837, 105.052, 105.319, 105.394, 106.176 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "7779abe7199eff8935fee9269731354959c6e998",
+          "message": "Check that a native select's and range's keys reach them, which is what the driver can show\n\nThe settings-limits spec failed on macOS and Linux alike: a typed letter\nnever picked in the override select, and ArrowRight never stepped the text\nsize. The cause is the suite's driver, not the app. The embedded WebDriver\n(tauri-plugin-wdio-webdriver 1.4.0, platform/executor.rs) presses a key by\ndispatching a script-made KeyboardEvent at the focused element. That event\nis untrusted, so no engine runs a select's or a range's default action for\nit; the driver acts out only a radio's arrows and a text box's typing.\n\nNothing of the app's eats the keys: no window, document or ancestor\nhandler prevents or stops arrows or letters for a form control. The spec\nnow checks exactly that, in the real WebView: the control holds the\nkeyboard, ArrowDown and a letter (select) and ArrowRight and ArrowLeft\n(range) arrive at it, reach the window unprevented, and the focus stays.\n\nThis also withdraws the WebKitGTK reading in the previous commit.\n\nRefs #626 #1545\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T11:46:32+04:00",
+          "tree_id": "f1f4ddf1f826eb21cf9166b0c190bb7cbc642bb9",
+          "url": "https://github.com/purlis/purlis/commit/7779abe7199eff8935fee9269731354959c6e998"
+        },
+        "date": 1791705102131,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.511881,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.484, 0.490, 0.512, 0.514, 0.514 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.684369500000003,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.312, 16.606, 16.684, 16.859, 17.272 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.3062285,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.889, 103.893, 104.306, 105.547, 105.646 ms"
           }
         ]
       }
