@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791720444690,
+  "lastUpdate": 1791723079934,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7518,6 +7518,48 @@ window.BENCHMARK_DATA = {
             "value": 101.3981075,
             "unit": "ms",
             "extra": "median of 5 runs: 100.731, 101.366, 101.398, 101.967, 102.261 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "3d23c6bdd845e7255ad2acbdb50e47f7b97e580f",
+          "message": "rulespelling: a unit test never reads the person's own settings file\n\nReview of lane QA for train 68 (#1325 line 4). The person's Claude Code\nsettings are read beside the project's; a unit test reaching the rules in\nforce would read the real ~/.claude/settings.json (or $CLAUDE_CONFIG_DIR)\nof whoever runs it, so its answer would hang on their machine. The tests\nthat need a file name it through Rules::in_force_with.\n\nRefs #1325\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T16:41:47+04:00",
+          "tree_id": "7c9319f5939b04f76f390536600bb3479ab7f1d4",
+          "url": "https://github.com/purlis/purlis/commit/3d23c6bdd845e7255ad2acbdb50e47f7b97e580f"
+        },
+        "date": 1791723078660,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5328035,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.512, 0.523, 0.533, 0.562, 0.563 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.087121,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.817, 17.040, 17.087, 17.225, 17.407 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.4358125,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.928, 104.223, 104.436, 104.461, 105.406 ms"
           }
         ]
       }
