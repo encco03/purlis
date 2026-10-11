@@ -45,6 +45,7 @@ macro_rules! app_commands {
                 opener::relaunch_ask,
                 opener::relaunch,
                 opener::window_holds_planes,
+                readonly::project_read_only,
                 windows::move_projects,
                 windows::projects_handed,
                 windows::charter_windows,
