@@ -5,6 +5,7 @@ import { Choice, SettingActions } from "./settings/components";
 import {
   commands,
   type FirstTaskRun,
+  type FirstTaskStarted,
   type PlaneId,
   type ProfileRow,
   type StartOptions,
@@ -15,10 +16,6 @@ const RUNS = [1, 2] as const;
 
 /** What each chat is called on the tab: ADR 0072's first-hour words, so "chat" and not "run". */
 const ORDINAL: Record<number, string> = { 1: "First chat", 2: "Second chat" };
-
-/** The branch FR-28 cuts for run `run` (`purlis_core::firsttask::label`, by the labelled-chat
- *  rule): what the tab looks for in the clone to know a run started before this launch. */
-const branchOf = (run: number) => `first-task-${run}`;
 
 /** The harnesses whose program is not installed on this machine, by kind, with their titles.
  *  Empty until read, and when it could not be: every profile is then offered as before. */
@@ -34,8 +31,9 @@ export interface FirstTaskDoes {
     persona: string | null,
     run: number,
   ) => Promise<FirstTaskRun | string>;
-  /** Show a run's diff: a shell tab in its branch's folder with its diff command run. */
-  showDiff: (run: FirstTaskRun) => void;
+  /** Show a run's diff: a shell tab in its branch's folder with its diff command run. A run
+   *  this launch started, or one read back from the clone (#945). */
+  showDiff: (run: Pick<FirstTaskRun, "folder" | "workspace" | "diff">) => void;
   /** The runs started so far, by clone and then by number. The plane's, not the tab's: a run's
    *  chat opens in front, and the tab is drawn again when the operator comes back to it. */
   runs: Readonly<Record<string, Readonly<Partial<Record<number, FirstTaskRun>>>>>;
@@ -83,7 +81,7 @@ export function FirstTaskTab({
    *  program the look judges, does not start (a missing harness never starts on a quick press). */
   const [looked, setLooked] = useState(false);
   /** The runs whose branch is in the clone (#945): the ones that started before this launch. */
-  const [onDisk, setOnDisk] = useState<Partial<Record<number, string>>>({});
+  const [onDisk, setOnDisk] = useState<Partial<Record<number, FirstTaskStarted>>>({});
   /** Why either look below could not answer: said under the intro, never swallowed (#1719). */
   const [unlooked, setUnlooked] = useState<string>();
   const [unlisted, setUnlisted] = useState<string>();
@@ -138,13 +136,14 @@ export function FirstTaskTab({
   }, [again]);
 
   // Which runs started before this launch: their branches are in the clone, whatever the window
-  // remembers (#945). The clone is `<workspace>/<repo>` in the project's layout.
+  // remembers, each with the command that shows its diff (#945). The clone is
+  // `<workspace>/<repo>` in the project's layout.
   useEffect(() => {
     let gone = false;
     const [repo, workspace] = clone.split(/[\\/]/).filter(Boolean).reverse();
     if (!repo || !workspace) return;
     void commands
-      .worktreeList(plane, workspace, repo)
+      .firstTaskStarted(plane, workspace, repo)
       .then((answer) => {
         if (gone) return;
         if (answer.status === "error") {
@@ -152,11 +151,8 @@ export function FirstTaskTab({
           return;
         }
         setUnlisted(undefined);
-        const started: Partial<Record<number, string>> = {};
-        for (const run of RUNS) {
-          const cut = (answer.data ?? []).find((one) => one.branch === branchOf(run) && !one.stale);
-          if (cut?.branch) started[run] = cut.branch;
-        }
+        const started: Partial<Record<number, FirstTaskStarted>> = {};
+        for (const one of answer.data ?? []) started[one.run] = one;
         setOnDisk(started);
       })
       .catch((err: unknown) => {
@@ -272,9 +268,10 @@ export function FirstTaskTab({
       )}
       {RUNS.map((run) => {
         const done = runs[run];
-        // Started before this launch: its branch is in the clone. Its diff waits on the commit it
-        // was cut from, which only the run this launch started carries.
+        // Started before this launch: its branch is in the clone, and the core read back the
+        // commit it was cut from, or says why it could not.
         const before = done ? undefined : onDisk[run];
+        const beforeDiff = before?.diff;
         const profile = chosen(run);
         const labelId = `${groupId}-${run}`;
         return (
@@ -295,7 +292,26 @@ export function FirstTaskTab({
                 </button>
               </p>
             ) : before ? (
-              <p className="came-back">{`Started on the branch ${before}.`}</p>
+              <p className="came-back">
+                {`Started on the branch ${before.branch}.`}{" "}
+                {beforeDiff ? (
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      does?.showDiff({
+                        folder: before.folder,
+                        workspace: before.workspace,
+                        diff: beforeDiff,
+                      })
+                    }
+                  >
+                    Show its diff
+                  </button>
+                ) : (
+                  before.no_diff
+                )}
+              </p>
             ) : (
               <>
                 <Choice

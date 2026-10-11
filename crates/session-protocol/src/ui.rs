@@ -275,6 +275,9 @@ pub const WINDOW_ONLY: &[&str] = &[
     // Why this purlis opens a project read-only (#826): the window's tab sentence, which no
     // link needs.
     "project_read_only",
+    // The first task's runs read back from the clone, each with its diff command (#945): the
+    // window's First task tab alone.
+    "first_task_started",
 ];
 
 /// **The commands of who may dispatch to whom**, by name (spec #1483): every one is on
