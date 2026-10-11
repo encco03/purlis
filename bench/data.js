@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791690846973,
+  "lastUpdate": 1791694678871,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -6972,6 +6972,48 @@ window.BENCHMARK_DATA = {
             "value": 106.304351,
             "unit": "ms",
             "extra": "median of 5 runs: 101.933, 105.198, 106.304, 106.343, 106.785 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "a66e84c7f7d5d7ae93d7d04fc623c174ccb7eab2",
+          "message": "Draw the window's own lines as part of the Inbox's Notices\n\nInside the Inbox the window's list loses the band's rule: it reads as the top of\nthe Notices it is listed with (#1695).\n\nRefs #1695\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T08:53:34+04:00",
+          "tree_id": "250a87ea2903783630e59296dd8fe6f71c64e453",
+          "url": "https://github.com/purlis/purlis/commit/a66e84c7f7d5d7ae93d7d04fc623c174ccb7eab2"
+        },
+        "date": 1791694677536,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.528427,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.457, 0.520, 0.528, 0.531, 0.532 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.175812,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.583, 16.962, 17.176, 17.192, 17.687 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.301671,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.096, 103.892, 104.302, 105.624, 106.298 ms"
           }
         ]
       }
