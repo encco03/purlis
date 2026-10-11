@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791758432443,
+  "lastUpdate": 1791761640758,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8022,6 +8022,48 @@ window.BENCHMARK_DATA = {
             "value": 101.68435199999999,
             "unit": "ms",
             "extra": "median of 5 runs: 100.356, 101.244, 101.684, 102.051, 102.062 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "4062f870e9f57f06d4c4a9fc91fcc5d283c33bcd",
+          "message": "The sandbox names a package folder once, refuses an over-long start in words, and tells refusals off the proxy's thread\n\n#1425: a package a runner loads from node_modules is named once, as its\nfolder, and a missing folder a name Node loads first starts with is\nnamed once in the folders the command runs in; a path a named folder\nalready holds is not named again, in a config and across the project's\nconfigs. Every path named before is still protected (a rule on a folder\nholds everything below it). MOST_NAMED stays 1024; the stress monorepo\nthat was refused names 291, and the unit-test monorepo 196 (was 561).\nThe files a runner tries beside a folder it is pointed at are named too.\nseatbelt::fits_exec measures a start's whole argv and environment\nagainst the system's limit and refuses with a plain sentence; its call\nin Applied::line is left for the round that owns sandbox.rs.\n\n#1353: the egress proxy keeps a refusal in its record at once, answers\nthe client, and tells the app on a teller thread of its own. One chat\nholds at most a fifth of the network record, letting go of its own\noldest lines. The doctor counts purlis's own blocks at most once per\nchat a day.\n\nRefs #1425\nRefs #1353\nRefs #1683\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T03:12:49+04:00",
+          "tree_id": "0723d0eb356f58f70aab9b7bedfea91ad74c5c83",
+          "url": "https://github.com/purlis/purlis/commit/4062f870e9f57f06d4c4a9fc91fcc5d283c33bcd"
+        },
+        "date": 1791761639849,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.47082250000000003,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.467, 0.468, 0.471, 0.486, 0.486 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.3746355,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.209, 16.315, 16.375, 16.406, 16.479 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.460619,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.240, 101.393, 101.461, 101.721, 102.320 ms"
           }
         ]
       }
