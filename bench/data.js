@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791705103548,
+  "lastUpdate": 1791707070626,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7266,6 +7266,48 @@ window.BENCHMARK_DATA = {
             "value": 104.3062285,
             "unit": "ms",
             "extra": "median of 5 runs: 102.889, 103.893, 104.306, 105.547, 105.646 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "144608420342d129e03f2189f22f92f8643fb615",
+          "message": "Give the kept-link note its tier: device-bound, transient\n\nADR 0069 asks every Machine store to say whether it syncs. The note says why one machine\nkept a link, so it is device-bound, as the move journal beside it is.\n\nRefs #1698\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T11:59:20+04:00",
+          "tree_id": "389b7acb86e8049f9bf625524909476729fd5e65",
+          "url": "https://github.com/purlis/purlis/commit/144608420342d129e03f2189f22f92f8643fb615"
+        },
+        "date": 1791707069382,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5344789999999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.529, 0.534, 0.534, 0.542, 0.555 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.133550999999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.317, 17.091, 17.134, 17.147, 17.850 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.4999285,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.050, 104.117, 104.500, 105.358, 105.512 ms"
           }
         ]
       }
