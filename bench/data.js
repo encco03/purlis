@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791742090772,
+  "lastUpdate": 1791748078221,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7770,6 +7770,48 @@ window.BENCHMARK_DATA = {
             "value": 104.384705,
             "unit": "ms",
             "extra": "median of 5 runs: 101.457, 103.138, 104.385, 105.643, 105.905 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "549fa7b56cdafd909d5b58c073a4e55956138d92",
+          "message": "e2e: stop waiting out a picker that never comes, and time each spec's hooks\n\n#1765's first notices: opened-repo-forges.e2e.ts took 94 to 99 s, nearly all of it one test,\nbecause each of its two opens waited the full 45 s for a first chat's picker that neither repo\ndraws any more. It now waits 5 s of quiet (no trust gate, no picker up) and goes on; a picker\nor a gate that does come is handled as before.\n\nsettings-limits.e2e.ts took 109 to 121 s with no test of it past 2.7 s, so its time is in its\nhooks, which were not recorded. afterHook now writes each hook's time to timings.jsonl too,\nlisted with the tests under WebdriverIO's own title for it.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T22:31:30+04:00",
+          "tree_id": "ed52efa2a0f87f67208fe6d49f823ef069144f84",
+          "url": "https://github.com/purlis/purlis/commit/549fa7b56cdafd909d5b58c073a4e55956138d92"
+        },
+        "date": 1791748077164,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.509811,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.493, 0.501, 0.510, 0.527, 0.540 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.811578,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.454, 16.691, 16.812, 17.049, 17.140 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.7594435,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.666, 104.349, 104.759, 105.642, 106.258 ms"
           }
         ]
       }
