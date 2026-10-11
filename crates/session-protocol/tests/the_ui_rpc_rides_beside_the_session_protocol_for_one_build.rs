@@ -229,9 +229,13 @@ async fn answering_an_ask_is_never_served_on_the_link_even_to_the_window() {
     assert!(ui::WINDOW_ONLY.contains(&"first_task_started"));
     // And what the person kept blocked here, read for the Inbox (#1700).
     assert!(ui::WINDOW_ONLY.contains(&"sandbox_kept_blocked"));
+    // And the project's harness declarations, with Open file on one (#1389).
+    for command in ["project_harness_declarations", "open_harness_declaration"] {
+        assert!(ui::WINDOW_ONLY.contains(&command), "{command}");
+    }
     assert_eq!(
         ui::WINDOW_ONLY.len(),
-        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1
+        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2
     );
 }
 

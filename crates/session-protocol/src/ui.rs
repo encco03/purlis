@@ -280,6 +280,10 @@ pub const WINDOW_ONLY: &[&str] = &[
     "first_task_started",
     // What the person kept blocked here (#1700): their answers, read for the Inbox alone.
     "sandbox_kept_blocked",
+    // The project's harness declarations in Settings, and Open file on one, which starts the
+    // person's editor (#1389).
+    "project_harness_declarations",
+    "open_harness_declaration",
 ];
 
 /// **The commands of who may dispatch to whom**, by name (spec #1483): every one is on

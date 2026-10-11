@@ -46,6 +46,8 @@ macro_rules! app_commands {
                 opener::relaunch,
                 opener::window_holds_planes,
                 readonly::project_read_only,
+                harnessdecls::project_harness_declarations,
+                harnessdecls::open_harness_declaration,
                 windows::move_projects,
                 windows::projects_handed,
                 windows::charter_windows,

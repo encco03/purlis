@@ -60,7 +60,7 @@ pub enum NotLaunched {
     #[error("there is no line {0}: lines are counted from 1")]
     NoLine(u32),
     #[error(
-        "neither $VISUAL nor $EDITOR is set where purlis was started: set one, or choose \
+        "neither `$VISUAL` nor `$EDITOR` is set where purlis was started: set one, or choose \
          VS Code, Zed or a JetBrains IDE in Settings"
     )]
     NoVariable,
