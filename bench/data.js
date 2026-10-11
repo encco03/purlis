@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791702324250,
+  "lastUpdate": 1791703930163,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7182,6 +7182,48 @@ window.BENCHMARK_DATA = {
             "value": 105.01397,
             "unit": "ms",
             "extra": "median of 5 runs: 103.313, 104.757, 105.014, 105.016, 106.201 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "444fcbe153cfa8fb49be3fd96f3f5d1149fd5b54",
+          "message": "Meet CI: scan an unparseable TOML file that is not the project's own\n\nTwo save-scan tests wrote a charter.toml that does not parse. That now\nmakes the project read-only (FR-24), and its save is refused before the\nscan runs. They scan a harness declaration instead.\n\nRefs #826\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T11:13:47+04:00",
+          "tree_id": "7899c3df47633dee680cb66bfb50243151c00cfe",
+          "url": "https://github.com/purlis/purlis/commit/444fcbe153cfa8fb49be3fd96f3f5d1149fd5b54"
+        },
+        "date": 1791703929438,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5192809999999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.493, 0.513, 0.519, 0.544, 0.557 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.9793605,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.500, 16.854, 16.979, 17.060, 17.088 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.3192885,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.837, 105.052, 105.319, 105.394, 106.176 ms"
           }
         ]
       }
