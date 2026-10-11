@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791726140005,
+  "lastUpdate": 1791726913082,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7602,6 +7602,48 @@ window.BENCHMARK_DATA = {
             "value": 104.94136850000001,
             "unit": "ms",
             "extra": "median of 5 runs: 103.374, 103.572, 104.941, 105.000, 107.355 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "ddf300a2cdda23995f3ec0a22ae311e4b45d19a8",
+          "message": "Let a tasks menu line's place give way before its state word\n\nThe footer fit spec named what ran past the menu's edge at 1600 px: the\nstate word of rows at the menu's 30rem cap. A line's place (\"in ...\",\na qualifier, or why a row cannot run) was flex: none, so the row could\nnot get narrower than its name's floor plus its place, age and state;\nthe place now shrinks with an ellipsis, and the state word stays whole.\n\nRefs #1545\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T17:44:23+04:00",
+          "tree_id": "fa201d2a744f599d6ad303145029a9767f595954",
+          "url": "https://github.com/purlis/purlis/commit/ddf300a2cdda23995f3ec0a22ae311e4b45d19a8"
+        },
+        "date": 1791726912120,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5293585000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.527, 0.529, 0.529, 0.539, 0.557 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.9065805,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.608, 16.889, 16.907, 17.002, 17.398 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.540732,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.666, 104.534, 104.541, 105.001, 106.764 ms"
           }
         ]
       }
