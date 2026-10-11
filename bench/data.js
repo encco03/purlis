@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791709086508,
+  "lastUpdate": 1791713095637,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7350,6 +7350,48 @@ window.BENCHMARK_DATA = {
             "value": 101.008883,
             "unit": "ms",
             "extra": "median of 5 runs: 100.792, 100.999, 101.009, 101.194, 102.838 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "4d937f48f8ed664f590a0dfaa56db6910a67a0d2",
+          "message": "Say the read-only tab sentence is not drawn yet\n\nThe app now serves why a project is read-only (project_read_only), but\nno tab mounts ReadOnlyLine yet: that wiring is #826's remaining work.\nThe plane format marks the window's half decided, not yet written, and\nthe changelog fragment that said the tab shows it waits for the change\nthat draws it.\n\nRefs #826\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T14:01:34+04:00",
+          "tree_id": "b640423f392fdf32a10e1a28588b1ddda863ad4e",
+          "url": "https://github.com/purlis/purlis/commit/4d937f48f8ed664f590a0dfaa56db6910a67a0d2"
+        },
+        "date": 1791713094224,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.523398,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.510, 0.518, 0.523, 0.532, 0.535 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.154663,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.538, 17.139, 17.155, 17.469, 17.571 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.9075325,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.500, 104.384, 104.908, 105.715, 106.765 ms"
           }
         ]
       }
