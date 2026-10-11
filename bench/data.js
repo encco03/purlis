@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791696941778,
+  "lastUpdate": 1791697722303,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7056,6 +7056,48 @@ window.BENCHMARK_DATA = {
             "value": 104.057154,
             "unit": "ms",
             "extra": "median of 5 runs: 103.284, 103.981, 104.057, 106.383, 107.590 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "d8de874aaf389e8b66296ccaaacb9124747e0b06",
+          "message": "Meet CI: a refused Discard's tests say what changed, a test sheds steering first\n\nThe discard test in handoff.rs still expected the plain \"changed since you\nwere asked\" refusal; it now names what changed (the file and the commit),\nand a folder written again with the same list says WRITTEN_AGAIN, as #1472\nwords them. The new worktree-dispatch test opens with unsteered!() before\nits comment, as the directory's guard reads it.\n\nRefs #1472\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T09:37:34+04:00",
+          "tree_id": "d22805465cedf811ac8ff318e37c4525dd6b21dc",
+          "url": "https://github.com/purlis/purlis/commit/d8de874aaf389e8b66296ccaaacb9124747e0b06"
+        },
+        "date": 1791697721389,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.47567099999999995,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.465, 0.465, 0.476, 0.478, 0.482 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.56595,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.524, 16.558, 16.566, 16.610, 16.654 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 102.6093185,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.610, 102.540, 102.609, 102.953, 103.247 ms"
           }
         ]
       }
