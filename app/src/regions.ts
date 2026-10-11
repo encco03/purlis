@@ -202,8 +202,9 @@ export const CATALOGUE: Record<RegionId, Definition> = {
   navigation: {
     name: "Navigation",
     size: 16,
-    // Search and Changes since #1676: Changes holds what the bottom region drew (B-7).
-    views: ["chats", "explorer", "search", "changes"],
+    // Search since #1676. Changes, which holds what the bottom region drew (B-7), was here
+    // too until it moved to the Panel's left half (#1739, P-2).
+    views: ["chats", "explorer", "search"],
   },
   // The right is "for you" (ADR 0038 as amended 2026-10-10, B-13): what is asking for you,
   // each a view, opening on the Inbox, first on its bar (P-2, #1738); the extensions' panels
@@ -215,10 +216,11 @@ export const CATALOGUE: Record<RegionId, Definition> = {
     panels: true,
   },
   // **The Panel's halves** (spec #1736, P-1, P-2): Repos in the left one, out of Explorer
-  // (#1737); Memory, Todos and Sessions in the right one, out of the right sidebar (#1738), and
-  // opening on Memory (P-14). A half with no views is never drawn. 30 is the Panel's height
-  // (P-12), not a width; how the halves share the width is {@link SPLIT}.
-  "panel-left": { name: "Panel, left half", size: 30, views: ["repos"], half: true },
+  // (#1737), and Changes after it, out of the left sidebar (#1739); Memory, Todos and Sessions in
+  // the right one, out of the right sidebar (#1738), and opening on Memory (P-14). A half with no
+  // views is never drawn. 30 is the Panel's height (P-12), not a width; how the halves share the
+  // width is {@link SPLIT}.
+  "panel-left": { name: "Panel, left half", size: 30, views: ["repos", "changes"], half: true },
   "panel-right": { name: "Panel, right half", size: 30, views: RIGHT_HALF_VIEWS, half: true },
 };
 
@@ -325,7 +327,7 @@ const RENAMED: Record<string, RegionId> = { explorer: "navigation" };
 
 /** Region ids an older build wrote for a region this one has folded into another, and so
  *  skips without a word: what it drew is still on screen, somewhere else. The `bottom` region
- *  is the navigation region's Changes view since #1676. */
+ *  is the Changes view since #1676, in the Panel's left half since #1739. */
 const RETIRED: readonly string[] = ["bottom"];
 
 /** The side every build before #1676 had along the bottom. A region a file put there goes

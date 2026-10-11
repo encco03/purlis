@@ -435,3 +435,10 @@ as the left half's `share` of the width; each half's one line (P-11), which is t
 section heading moved up: the open view's title, the actions its heading had, and a chevron
 that puts the half away. A file whose right sidebar was left on Memory, Todos or Sessions opens
 the sidebar on the Inbox without a word, since nothing of the person's is lost.
+
+**Built** (#1739): Changes is in the left half, after Repos, and the left sidebar is Chats,
+Explorer and Search. A Lower icon carries its view's badge the way a sidebar's icon does, on the
+bar outside the half, so it is there while the half is away: Changes counts uncommitted files,
+Todos its open items once it is in the right half (#1738), and Repos draws commits behind and
+ahead only while a clone is behind. A view's key and its palette row open it where the
+arrangement holds it, a sidebar or a half, bringing back a half that was away.

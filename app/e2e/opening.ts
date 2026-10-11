@@ -176,7 +176,8 @@ export async function closeProject(closer: string): Promise<void> {
  * on Chats, the right on the Inbox, and the Panel's right half on Memory (#1738), so a spec about
  * the explorer's rows shows the Explorer first and puts Chats back after, leaving the window as
  * the next spec expects it; a spec about another right-hand panel puts Memory back the same way.
- * Memory, Todos and Sessions are on the right bar's Lower icons (#1738).
+ * A view in a half of the Panel is pressed on its Lower icon, wherever it lives (#1739): the left
+ * half opens on Repos, so a spec about Changes puts Repos back after.
  */
 export async function showView(
   name:
@@ -184,6 +185,7 @@ export async function showView(
     | "Explorer"
     | "Search"
     | "Changes"
+    | "Repos"
     | "Inbox"
     | "Todos"
     | "Memory"
@@ -191,10 +193,8 @@ export async function showView(
     | "Sessions"
     | "Vaults",
 ): Promise<void> {
-  const left = ["Chats", "Explorer", "Search", "Changes"].includes(name);
-  const lowerRight = ["Memory", "Todos", "Sessions"].includes(name);
-  const side = left ? "Navigation" : lowerRight ? "Panel, right half" : "Attention";
-  const tab = await $(`[role="tablist"][aria-label="${side}"] [role="tab"][aria-label="${name}"]`);
+  // On whichever bar holds it: a sidebar's, or the Lower icons of its half of the Panel.
+  const tab = await $(`.activity-bar [role="tab"][aria-label="${name}"]`);
   await tab.waitForExist({ timeout: 30_000 });
   if ((await tab.getAttribute("aria-selected")) !== "true") await tab.click();
   await browser.waitUntil(async () => (await tab.getAttribute("aria-selected")) === "true", {

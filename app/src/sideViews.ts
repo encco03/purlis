@@ -7,9 +7,10 @@
  */
 /**
  * **One of purlis's own views**: the left side's Chats and Explorer (#1673), Search and Changes
- * (#1676), and Repos in the left half of the Panel (#1737), and the right side's Inbox (#1692),
- * Personas and Vaults (#1678), with Memory, Todos and Sessions in the right half of the Panel
- * (#1738). Data, as a region is: the catalogue says which region holds it, the placement says which is open, and
+ * (#1676), and Repos in the left half of the Panel (#1737) with Changes beside it (#1739), and the
+ * right side's Inbox (#1692), Personas and Vaults (#1678), with Memory, Todos and Sessions in the
+ * right half of the Panel (#1738). Data, as a region is: the catalogue says which region holds it,
+ * the placement says which is open, and
  * `RegionFrame` draws the bar and the views from that.
  */
 export type OwnViewId =
