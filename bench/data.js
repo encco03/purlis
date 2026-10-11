@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791754695080,
+  "lastUpdate": 1791756183701,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7938,6 +7938,48 @@ window.BENCHMARK_DATA = {
             "value": 104.75309899999999,
             "unit": "ms",
             "extra": "median of 5 runs: 103.920, 104.604, 104.753, 105.365, 106.016 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "a216f7d8f7fee8edbe01766a7307dbf8a9e48cbc",
+          "message": "Licence-header guard: the opencode shim is generated, so it has none\n\nThe bundled opencode shim is purlis_core::opencode's output, and an app\ntest compares the two byte for byte. Take the header back out, list the\nshim among the generated exclusions, and drop the first-line-contract\nrule that only it used.\n\nSigned-off-by: Aaron Yordanyan <eyehollow@gmail.com>\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T01:24:21+04:00",
+          "tree_id": "5bc4f8d7fd1efc13ff9d9e7dbd0634a3f6719a5c",
+          "url": "https://github.com/purlis/purlis/commit/a216f7d8f7fee8edbe01766a7307dbf8a9e48cbc"
+        },
+        "date": 1791756182802,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.521462,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.501, 0.520, 0.521, 0.540, 0.542 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.990294,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.437, 16.628, 16.990, 17.095, 17.182 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.315945,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.017, 105.068, 105.316, 105.768, 105.778 ms"
           }
         ]
       }
