@@ -246,7 +246,17 @@ impl Workspace {
     /// Asked of the PATH BEING TOUCHED, not of the workspace directory above it: a symlink
     /// at `workspace.md`, or at `memory/`, redirects the write just as one at the workspace
     /// does, and checking only the directory left both open.
+    ///
+    /// **And nothing is written in a project this purlis may not write** (FR-24, #826): its
+    /// manifest, memory, todos and words are the project's files, whoever asks for the write,
+    /// a chat's hook or tool, the app on a chat's behalf, or the window.
     fn writable(&self, path: &Path) -> io::Result<()> {
+        if let Some(why) = crate::compat::read_only(&self.plane_root) {
+            return Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                format!("nothing was written: {why}"),
+            ));
+        }
         crate::contain::writable(&self.plane_root, path).map_err(refusal)
     }
 
@@ -1105,6 +1115,50 @@ mod entry_tests {
         assert_eq!(entry.title, "bare");
         assert_eq!(entry.stamp, "2026-09-22 10:00");
         assert_eq!(entry.body, "body");
+    }
+}
+
+/// FR-24, #826: a project this purlis may not write gets no workspace write, whoever asks.
+#[cfg(test)]
+mod read_only_tests {
+    use super::*;
+
+    #[test]
+    fn no_workspace_file_is_written_in_a_project_this_purlis_may_not_write() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().canonicalize().unwrap();
+        std::fs::create_dir_all(root.join("workspaces/demo")).unwrap();
+        std::fs::write(
+            root.join("workspaces/demo/workspace.json"),
+            "{\"name\": \"demo\"}\n",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join(crate::plane::MANIFEST),
+            "schema = 2\nrequires = [{ feature = \"from-the-future\", since = \"9.0.0\" }]\n",
+        )
+        .unwrap();
+        let ws = Plane::open(&root).workspace("demo").unwrap();
+        let stamp = chrono::NaiveDateTime::default();
+        let refusals = [
+            ws.add_todo("Port the picker", stamp).err(),
+            ws.set_vision("Ship it").err(),
+            ws.scaffold_memory().err(),
+            ws.write_manifest_text("{\"name\": \"other\"}\n").err(),
+        ];
+        for refused in refusals {
+            let refused = refused.expect("refused");
+            assert!(refused.to_string().contains("from-the-future"), "{refused}");
+        }
+        let left: Vec<_> = std::fs::read_dir(root.join("workspaces/demo"))
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        assert_eq!(left, ["workspace.json"]);
+        assert_eq!(
+            std::fs::read_to_string(root.join("workspaces/demo/workspace.json")).unwrap(),
+            "{\"name\": \"demo\"}\n"
+        );
     }
 }
 

@@ -19,7 +19,8 @@ pub fn path_for(root: &Path, when: chrono::DateTime<chrono::Utc>, device: &str) 
         .join(format!("{}.{device}.jsonl", when.format("%Y-%m")))
 }
 
-/// Log one use of `skill` by `persona` — `skilluse.record`.
+/// Log one use of `skill` by `persona` — `skilluse.record`. Nothing is logged in a project this
+/// purlis may not write ([`crate::compat::read_only`], #826): the log is committed.
 pub fn record(
     root: &Path,
     skill: &str,
@@ -28,7 +29,7 @@ pub fn record(
     device: &str,
 ) -> Option<PathBuf> {
     let skill = crate::memstore::py_strip(skill);
-    if skill.is_empty() {
+    if skill.is_empty() || crate::compat::read_only(root).is_some() {
         return None;
     }
     let persona = persona
@@ -67,5 +68,21 @@ mod tests {
              \"2026-05-04T11:32:17+00:00\"}\n{\"persona\": null, \"skill\": \"x\", \"ts\": \
              \"2026-05-04T11:32:17+00:00\"}\n"
         );
+    }
+
+    #[test]
+    fn no_skill_use_is_logged_in_a_project_this_purlis_may_not_write() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join(crate::plane::MANIFEST),
+            "schema = 2\nrequires = [{ feature = \"from-the-future\", since = \"9.0.0\" }]\n",
+        )
+        .unwrap();
+        let when = chrono::Utc::now();
+        assert_eq!(
+            record(dir.path(), "charter:persona", Some("ops"), when, "box"),
+            None
+        );
+        assert!(!dir.path().join("personas").exists());
     }
 }

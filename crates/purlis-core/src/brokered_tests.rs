@@ -41,6 +41,64 @@ fn files_in(dir: &Path) -> Vec<String> {
     names
 }
 
+/// Every file under `dir`, with its bytes.
+fn tree(dir: &Path) -> std::collections::BTreeMap<PathBuf, Vec<u8>> {
+    let mut all = std::collections::BTreeMap::new();
+    let mut todo = vec![dir.to_path_buf()];
+    while let Some(at) = todo.pop() {
+        for entry in std::fs::read_dir(&at).unwrap().filter_map(Result::ok) {
+            let path = entry.path();
+            if path.is_dir() {
+                all.insert(path.clone(), Vec::new());
+                todo.push(path);
+            } else {
+                all.insert(path.clone(), std::fs::read(&path).unwrap());
+            }
+        }
+    }
+    all
+}
+
+#[test]
+fn no_write_a_chat_asks_for_lands_in_a_project_this_purlis_may_not_write() {
+    // #826: memory, a todo and the workspace's own words are committed files.
+    let (_dir, root) = a_project();
+    std::fs::write(
+        root.join(crate::plane::MANIFEST),
+        "schema = 2\nrequires = [{ feature = \"from-the-future\", since = \"9.0.0\" }]\n",
+    )
+    .unwrap();
+    let before = tree(&root);
+    let text = || "A fact".to_owned();
+    for write in [
+        Write::PersonaRemember {
+            text: text(),
+            title: None,
+            shared: false,
+        },
+        Write::PersonaRemember {
+            text: text(),
+            title: None,
+            shared: true,
+        },
+        Write::WorkspaceRemember {
+            text: text(),
+            title: None,
+        },
+        Write::Todo { text: text() },
+        Write::WorkspaceVision { text: text() },
+        Write::WorkspaceSection {
+            section: Section::Decisions,
+            text: text(),
+        },
+    ] {
+        let refused =
+            perform(&root, &in_alpha_as(Some("steward")), &write, now()).expect_err("refused");
+        assert!(refused.contains("from-the-future"), "{write:?}: {refused}");
+        assert_eq!(tree(&root), before, "{write:?} wrote");
+    }
+}
+
 #[test]
 fn a_persona_remember_lands_in_the_chats_own_persona_memory() {
     let (_dir, root) = a_project();

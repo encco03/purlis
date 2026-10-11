@@ -223,6 +223,13 @@ pub fn record_handoff(
     when: chrono::DateTime<chrono::Utc>,
     device: &str,
 ) -> io::Result<PathBuf> {
+    // The log is committed: a project this purlis may not write gets no row (#826).
+    if let Some(why) = crate::compat::read_only(root) {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            format!("nothing was written: {why}"),
+        ));
+    }
     try_append(
         &path_for(root, when, device),
         root,
@@ -303,6 +310,26 @@ mod tests {
              \"ts\": \"2026-05-04T11:32:17+00:00\"}\n"
         );
         assert!(tally(dir.path()).is_empty(), "a handoff is not a dispatch");
+    }
+
+    #[test]
+    fn a_project_this_purlis_may_not_write_gets_no_handoff_row() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            dir.path().join(crate::plane::MANIFEST),
+            "schema = 2\nrequires = [{ feature = \"from-the-future\", since = \"9.0.0\" }]\n",
+        )
+        .unwrap();
+        let refused = record_handoff(
+            dir.path(),
+            Placement::Here,
+            false,
+            chrono::Utc::now(),
+            "box",
+        )
+        .unwrap_err();
+        assert!(refused.to_string().contains("from-the-future"), "{refused}");
+        assert!(!dir.path().join("personas").exists());
     }
 
     #[cfg(target_os = "macos")]
