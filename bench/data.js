@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791694678871,
+  "lastUpdate": 1791696941778,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7014,6 +7014,48 @@ window.BENCHMARK_DATA = {
             "value": 104.301671,
             "unit": "ms",
             "extra": "median of 5 runs: 103.096, 103.892, 104.302, 105.624, 106.298 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "5d6c2d6e5bc6fedd754821aaa7c8404e8fbc1b22",
+          "message": "Wait for every host to join before answering in the arriving-host window test\n\nmain's web job is red on this test since train 54: the Notice's hosts join\nas the registry lists them, so on a slow runner the press could fall inside\nthe settle time of the last join, or on the Notice as first drawn. The test\nnow waits until every host is drawn, settles, and answers the Notice on\nscreen then.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T09:34:23+04:00",
+          "tree_id": "aef3e9305a47d3195486ae4d4f9a9fbbfa0a899b",
+          "url": "https://github.com/purlis/purlis/commit/5d6c2d6e5bc6fedd754821aaa7c8404e8fbc1b22"
+        },
+        "date": 1791696940602,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.533684,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.519, 0.532, 0.534, 0.536, 0.540 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.2784735,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.711, 16.962, 17.278, 17.281, 17.377 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.057154,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.284, 103.981, 104.057, 106.383, 107.590 ms"
           }
         ]
       }
