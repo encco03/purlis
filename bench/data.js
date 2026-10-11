@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791701477264,
+  "lastUpdate": 1791702324250,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7140,6 +7140,48 @@ window.BENCHMARK_DATA = {
             "value": 101.613956,
             "unit": "ms",
             "extra": "median of 5 runs: 100.010, 101.286, 101.614, 102.154, 102.554 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "53007cda1a3481481bd9e7177b715f8e29eea83a",
+          "message": "Docs say the guards read every level a shell is handed\n\nhooks.md and handoff.md still said the handoff and dispatch guards look\none level into a string a shell runs and no deeper. They now read every\nlevel up to the nesting cap (a -c string, an eval, a here-string, a pipe\nor process substitution into a shell, a heredoc fed to one, a find -exec),\nthe handoff guard a case branch and a function body too, and a string\nhanded on past the cap is refused unread. What stays unseen is named\nbeside it. The recorded handoff refusal sentence is left as recorded.\n\nRefs #1426 #1582 #1419\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T10:58:53+04:00",
+          "tree_id": "a76575708d3c4718d656bf7ff15b82358e189d3f",
+          "url": "https://github.com/purlis/purlis/commit/53007cda1a3481481bd9e7177b715f8e29eea83a"
+        },
+        "date": 1791702323022,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5149495,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.507, 0.508, 0.515, 0.518, 0.527 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.671315999999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.367, 16.532, 16.671, 17.031, 17.070 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.01397,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.313, 104.757, 105.014, 105.016, 106.201 ms"
           }
         ]
       }
