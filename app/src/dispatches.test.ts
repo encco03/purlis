@@ -262,6 +262,12 @@ describe("the Dispatches tab's filters", () => {
     expect(losesNothing({ ...loss, ignored: [] })).toBe(false);
     expect(losesNothing({ ...loss, changes: [] })).toBe(false);
     expect(losesNothing({ ...loss, changes: [], ignored: [] })).toBe(true);
+    // Git state only the folder holds goes with it too, and so may what git would not say.
+    expect(losesNothing({ ...loss, changes: [], ignored: [], own: [] })).toBe(true);
+    expect(losesNothing({ ...loss, changes: [], ignored: [], own: ["config.worktree"] })).toBe(
+      false,
+    );
+    expect(losesNothing({ ...loss, changes: [], ignored: [], own: null })).toBe(false);
   });
 
   it("never says no commit is lost of a folder that is on no branch", () => {

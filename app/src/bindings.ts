@@ -8541,6 +8541,12 @@ export type WorktreeLoss = {
 	 *  **where they would be lost**: the folder is on no branch. Empty otherwise.
 	 */
 	lost: string[],
+	/**
+	 *  **What git keeps for this folder alone** (#1472), one line each: a ref only it has, its
+	 *  own settings, a commit only its history of HEAD holds. All of it goes with the folder.
+	 *  Empty where it has none; null where git would not say, which is never read as none.
+	 */
+	own?: string[] | null,
 };
 
 /**

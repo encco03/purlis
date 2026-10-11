@@ -1152,6 +1152,48 @@ describe("a dispatch's own branch", () => {
     );
   });
 
+  it("names what git keeps for the folder alone, which goes with it (#1472)", async () => {
+    core({
+      rows: WITH_BRANCHES,
+      loss: {
+        ...LOSS,
+        changes: [],
+        ignored: [],
+        own: [
+          "refs/bisect/bad, a ref only this folder has",
+          "5e1f00aa first try, a commit only this folder's history of HEAD holds",
+        ],
+      },
+    });
+    render(<App />);
+    await opened();
+
+    await userEvent.click(within(row("01K6W")).getByRole("button", { name: DISCARD }));
+
+    const question = await screen.findByRole("alertdialog", { name: ASKS });
+    expect(within(question).getByTestId("discard-loses-own")).toHaveTextContent(
+      "What git keeps for this folder alone goes with it:",
+    );
+    const lost = within(question).getByTestId("discard-loses");
+    expect(lost).toHaveTextContent("refs/bisect/bad, a ref only this folder has");
+    expect(lost).toHaveTextContent("5e1f00aa first try");
+    expect(within(question).queryByTestId("discard-loses-nothing")).toBeNull();
+  });
+
+  it("says where purlis could not read what git keeps for the folder alone (#1472)", async () => {
+    core({ rows: WITH_BRANCHES, loss: { ...LOSS, changes: [], ignored: [], own: null } });
+    render(<App />);
+    await opened();
+
+    await userEvent.click(within(row("01K6W")).getByRole("button", { name: DISCARD }));
+
+    const question = await screen.findByRole("alertdialog", { name: ASKS });
+    expect(within(question).getByTestId("discard-loses-own")).toHaveTextContent(
+      "purlis could not read whether git keeps anything for this folder alone. Whatever it keeps goes with it.",
+    );
+    expect(within(question).queryByTestId("discard-loses-nothing")).toBeNull();
+  });
+
   it("keeps the question open with the core's refusal where the folder changed", async () => {
     const changed =
       "What that branch's folder holds has changed since you were asked, so nothing was removed. Press Discard again to see what would be lost now.";

@@ -8812,6 +8812,7 @@ mod tests {
             seal: String::new(),
             unmerged: 0,
             lost: Vec::new(),
+            own: Some(Vec::new()),
         };
         assert_eq!(discard(&held, &dispatch, &nothing), Err(open.to_owned()));
         assert!(folder.join("scratch.txt").is_file());

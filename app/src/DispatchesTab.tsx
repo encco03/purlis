@@ -23,6 +23,7 @@ import {
   losesNothing,
   lostSaid,
   nestedSaid,
+  ownSaid,
   notStartedSaid,
   NO_PERSONA,
   NO_PERSONA_SAID,
@@ -517,10 +518,12 @@ function NotStarted({ rows }: { rows: NotStartedRow[] }) {
 
 /** What goes with a discarded folder, as the core read it: every uncommitted file by its path,
  *  every ignored path of the task's own, the commits made on no branch (the one thing a discard
- *  loses for good), then what becomes of the branch. */
+ *  loses for good), what git keeps for the folder alone (#1472), then what becomes of the
+ *  branch. */
 export function Loss({ loss }: { loss: WorktreeLoss }) {
   const lost = lostSaid(loss);
   const nested = nestedSaid(loss);
+  const own = ownSaid(loss);
   return (
     <div className="dispatch-loss" data-testid="discard-loses">
       {losesNothing(loss) && (
@@ -563,6 +566,14 @@ export function Loss({ loss }: { loss: WorktreeLoss }) {
               ? `\n… and ${loss.unmerged - loss.lost.length} more`
               : ""}
           </pre>
+        </>
+      )}
+      {own !== undefined && (
+        <>
+          <p className="honest" data-testid="discard-loses-own">
+            {own}
+          </p>
+          {loss.own && loss.own.length > 0 && <pre>{loss.own.join("\n")}</pre>}
         </>
       )}
       <p className="honest" data-testid="discard-branch">
