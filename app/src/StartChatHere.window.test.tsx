@@ -111,11 +111,12 @@ afterEach(() => {
 const starts = (asked: Asked[]) =>
   asked.filter((one) => one.cmd === "start_chat_here").map((one) => one.args);
 
-/** Picks the branch in the Explorer and opens `README.md` in a tab of its own, as a press on its
- *  row does; answers its "Start a chat here". */
+/** Picks the branch in the Panel's Repos view (#1737), opens `README.md` from the Explorer's
+ *  Files in a tab of its own, as a press on its row does; answers its "Start a chat here". */
 async function startFromThePreview() {
-  const explorer = await showTheExplorer();
-  await userEvent.click(await within(explorer).findByRole("treeitem", { name: /^one in svc/ }));
+  await showTheExplorer();
+  const repos = screen.getByRole("navigation", { name: "Repos" });
+  await userEvent.click(await within(repos).findByRole("treeitem", { name: /^one in svc/ }));
   const tree = await screen.findByRole("tree", { name: "Files of one in svc" });
   await userEvent.click(await within(tree).findByRole("treeitem", { name: /^README\.md/ }));
   await userEvent.click(

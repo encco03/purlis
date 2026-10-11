@@ -428,3 +428,10 @@ per project, and the first-launch open. The halves are regions of the arrangemen
 (`panel-left`, `panel-right`; `app/src/regions.ts`), so the rest — the right half and its split
 (#1738), Changes and the badges (#1739), moves (#1740), narrow windows and the keyboard order
 (#1741) — are data and rules on the same model.
+
+**And** (#1738): the right half, Memory, Todos and Sessions in it on the right bar's Lower
+icons, the right sidebar opening on the Inbox; the handle between the halves, kept per project
+as the left half's `share` of the width; each half's one line (P-11), which is the sidebar's
+section heading moved up: the open view's title, the actions its heading had, and a chevron
+that puts the half away. A file whose right sidebar was left on Memory, Todos or Sessions opens
+the sidebar on the Inbox without a word, since nothing of the person's is lost.
