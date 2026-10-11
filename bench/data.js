@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791697722303,
+  "lastUpdate": 1791701477264,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7098,6 +7098,48 @@ window.BENCHMARK_DATA = {
             "value": 102.6093185,
             "unit": "ms",
             "extra": "median of 5 runs: 101.610, 102.540, 102.609, 102.953, 103.247 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "e7bdfbe95bcf33bb612e115ce411855879a8ca85",
+          "message": "Read a branch's status once its watch holds, as a folder is read\n\nThe explorer read what a newly open branch changed at the same moment it\nasked for the branch to be watched. A file an agent wrote after that read\nand before the watch held was told by nothing, so it was drawn without its\nmark until something else moved in the branch. On inotify, watching a branch\nlists its folders through the bounded reader and can take longer than the\nstatus read beside it: the Linux scenario spec \"marks a file an agent adds\nor changes without a refresh\" met that on main d8de874a and on train 57.\n\nA newly open branch's status is now read once the branch_watch naming it\nhas answered, or after WATCH_WAIT_MS, and read once more when a watch slower\nthan that answers: the contract branchFolders.ts keeps for folders (#1427).\nThe wait helpers move from branchFolders.ts's own watch to any watch's.\n\nRefs #1107\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T10:38:01+04:00",
+          "tree_id": "8b2f6a5f9f3f6c2964d99e63fc2d5c4549558692",
+          "url": "https://github.com/purlis/purlis/commit/e7bdfbe95bcf33bb612e115ce411855879a8ca85"
+        },
+        "date": 1791701476093,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.4635515,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.446, 0.460, 0.464, 0.467, 0.472 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.4238855,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.198, 16.424, 16.424, 16.437, 16.745 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.613956,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.010, 101.286, 101.614, 102.154, 102.554 ms"
           }
         ]
       }
