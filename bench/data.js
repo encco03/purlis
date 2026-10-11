@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791731560481,
+  "lastUpdate": 1791733876163,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7686,6 +7686,48 @@ window.BENCHMARK_DATA = {
             "value": 101.563909,
             "unit": "ms",
             "extra": "median of 5 runs: 101.501, 101.552, 101.564, 102.006, 102.969 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "1489d0469c5eed3760ee589a9d689a7375ff3fa6",
+          "message": "Give the keyboard back to a moved view; read the pick count out\n\nA view's element moved between regions while the keyboard is in it lost\nthe keyboard to the page: the region it leaves notes where it was and the\nregion it lands in gives it back (never into a hidden view). The count of\npicked file rows is a live status, so a screen reader hears it change.\nA whole-window test moves Search to the Panel and finds the same box with\nits words.\n\nRefs #1752\nRefs #1151\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T19:42:08+04:00",
+          "tree_id": "6f4592e678e46b3d8d172e3225a57f60e139d241",
+          "url": "https://github.com/purlis/purlis/commit/1489d0469c5eed3760ee589a9d689a7375ff3fa6"
+        },
+        "date": 1791733875248,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5293650000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.497, 0.525, 0.529, 0.553, 0.603 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.010182,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.370, 16.948, 17.010, 17.131, 17.298 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 103.9491515,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.767, 103.924, 103.949, 104.218, 105.785 ms"
           }
         ]
       }
