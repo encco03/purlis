@@ -467,6 +467,11 @@ export const commands = {
 	/**  **Allow** on a row of Blocked lately (#1662): the window's alone (`WINDOW_ONLY`). */
 	allowBlockedHost: (plane: PlaneId, host: string, level: GrantLevel) => typedError<Allowed, string>(__TAURI_INVOKE("allow_blocked_host", { plane, host, level })),
 	/**
+	 *  **What the person kept blocked here** (#1700), from this machine's network record, newest
+	 *  first: the window's alone (`WINDOW_ONLY`).
+	 */
+	sandboxKeptBlocked: (plane: PlaneId) => typedError<KeptBlocked[], string>(__TAURI_INVOKE("sandbox_kept_blocked", { plane })),
+	/**
 	 *  Lists `folder` as one chats here may be granted (D-1342-10), this machine only: every refusal
 	 *  a write grant makes, but the allowlist it adds to. Answers the list as it is now, and what
 	 *  the folder holds that later code is loaded from, for the warning Settings shows.
@@ -5088,6 +5093,19 @@ export type Kept =
 "cut" | 
 /**  None of it: the record holds no brief. */
 "missing";
+
+/**
+ *  One **Keep blocked** a person answered here (#1700): what the Inbox's look back lists beside
+ *  what was allowed, since a no leaves no grant behind.
+ */
+export type KeptBlocked = {
+	/**  The host and port kept blocked, as a grant names it. */
+	target: string,
+	/**  The chat it was kept blocked for, by the name it was shown under, where the record has it. */
+	chat: string | null,
+	/**  When, in seconds since 1970. */
+	at: number,
+};
 
 /**
  *  What a Land would do, before it does any of it: the request, the head its checks passed at,

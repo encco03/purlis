@@ -1111,15 +1111,26 @@ pub fn keep_sandbox_block(
     shown: crate::taskblocks::BlockShown,
 ) -> Result<(), String> {
     let held = planes.held(&plane)?;
-    keep_block(held.chats(), session, &shown)
+    let block = keep_block(held.chats(), session, &shown)?;
+    // The person's no, kept where the Inbox's look back reads it (#1700).
+    if block.what == GrantWhat::Host {
+        crate::network::record_kept_blocked(
+            planes.network(),
+            held.root(),
+            held.chats(),
+            session,
+            &block.target,
+        );
+    }
+    Ok(())
 }
 
-/// [`keep_sandbox_block`] on `chats`.
+/// [`keep_sandbox_block`] on `chats`: the block it answered.
 pub(crate) fn keep_block(
     chats: &crate::chats::Chats,
     session: u32,
     shown: &crate::taskblocks::BlockShown,
-) -> Result<(), String> {
+) -> Result<crate::taskblocks::HeldBlock, String> {
     let block = crate::taskblocks::shown_one(chats.blocks(), session, shown)?;
     chats.blocks().answered(session, &block);
     if block.what == GrantWhat::Host
@@ -1127,7 +1138,7 @@ pub(crate) fn keep_block(
     {
         chats.keep_blocked_live(session, &host);
     }
-    Ok(())
+    Ok(block)
 }
 
 /// The chats of this project owed a restart (#1342, #1428): to take a grant, or because the

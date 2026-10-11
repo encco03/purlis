@@ -597,6 +597,21 @@ describe("what was allowed lately, in an empty Inbox (D-1700-7)", () => {
     expect(within(allowed).queryAllByRole("button")).toEqual([]);
   });
 
+  it("lists a Keep blocked the person answered beside what was allowed (#1700)", async () => {
+    core({
+      sandbox_grants: [],
+      dispatch_grants: { grants: [], all_locked: null, locked_pairs: [], locked_by: null },
+      sandbox_kept_blocked: [
+        { target: "pypi.org:443", chat: "steward 3", at: Math.floor(Date.now() / 1000) - 60 },
+      ],
+    });
+    draw([]);
+    const allowed = await screen.findByRole("region", { name: ALLOWED_LATELY });
+    expect(within(allowed).getByText("Kept pypi.org:443 blocked")).toBeTruthy();
+    expect(within(allowed).getByText("for that chat")).toBeTruthy();
+    expect(within(allowed).queryAllByRole("button")).toEqual([]);
+  });
+
   it("reads no grants while something waits", async () => {
     const calls = core();
     draw([permission(3, "a1", ["steward 3"])]);

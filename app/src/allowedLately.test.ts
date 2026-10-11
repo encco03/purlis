@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { DispatchGrant, SandboxGrant } from "./bindings";
+import type { DispatchGrant, KeptBlocked, SandboxGrant } from "./bindings";
 import { LATELY_MS, lately } from "./allowedLately";
 
 /**
@@ -74,6 +74,26 @@ describe("what was allowed lately", () => {
       NOW,
     );
     expect(listed?.says).toBe("Write in /w/\\u202egnp.exe");
+    expect(listed?.chat).toBe("steward\\u200b 3");
+  });
+
+  it("lists the person's Keep blocked answers beside what was allowed (#1700)", () => {
+    const kept: KeptBlocked[] = [
+      { target: "pypi.org:443", chat: "steward 3", at: ago(2_000) },
+      { target: "old.example.com:443", chat: null, at: ago(LATELY_MS + 1000) },
+    ];
+    const listed = lately([host("api", ago(60_000))], [], NOW, kept);
+    expect(listed.map((one) => [one.says, one.level, one.chat])).toEqual([
+      ["Kept pypi.org:443 blocked", "for that chat", "steward 3"],
+      ["Reach api.example.com", "for you on this machine", "steward 3"],
+    ]);
+  });
+
+  it("draws a host kept blocked with what draws as nothing written out (I-1)", () => {
+    const [listed] = lately([], [], NOW, [
+      { target: "a\u202eb.example.com:443", chat: "steward\u200b 3", at: ago(1000) },
+    ]);
+    expect(listed?.says).toBe("Kept a\\u202eb.example.com:443 blocked");
     expect(listed?.chat).toBe("steward\\u200b 3");
   });
 });

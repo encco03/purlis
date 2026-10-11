@@ -807,6 +807,16 @@ pub fn forget_sandbox_block(
         match crate::taskblocks::shown_one(blocks, session, &shown) {
             Ok(block) => {
                 blocks.answered(session, &block);
+                // The person's no, kept where the Inbox's look back reads it (#1700).
+                if block.what == crate::sandboxing::GrantWhat::Host {
+                    crate::network::record_kept_blocked(
+                        planes.network(),
+                        held.root(),
+                        held.chats(),
+                        session,
+                        &block.target,
+                    );
+                }
                 true
             }
             Err(_) => false,

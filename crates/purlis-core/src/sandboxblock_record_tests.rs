@@ -518,3 +518,51 @@ fn an_allows_scope_is_its_levels_word() {
         assert_eq!(Scope::from(level).word(), level.word());
     }
 }
+
+#[test]
+fn a_keep_blocked_is_read_back_as_the_persons_no_and_never_counted_as_a_block() {
+    let (dir, root) = project();
+    let record = Record::in_data(&dir.path().join("data"));
+    record
+        .write(
+            &root,
+            &Entry::kept_blocked(
+                "api.example.com:443",
+                chat("01J", "fix the build"),
+                Some("steward"),
+                1_000,
+            ),
+        )
+        .expect("written");
+
+    let read = record.read(&root, 1_000);
+    assert_eq!(read.len(), 1);
+    assert!(read[0].is_kept_blocked());
+    assert_eq!(read[0].target.as_deref(), Some("api.example.com:443"));
+    assert_eq!(read[0].chat.name.as_deref(), Some("fix the build"));
+    assert!(!read[0].is_host_block());
+    assert_eq!(counts(&read, 1_000), Vec::new());
+    assert_eq!(hosts_refused(&read, 1_000), Vec::new());
+}
+
+#[test]
+fn an_ask_nobody_answered_is_not_a_keep_blocked() {
+    let asked = Entry::connected(
+        Some("api.example.com:443"),
+        ASKED,
+        1,
+        Chat::default(),
+        None,
+        1,
+    );
+    let timed_out = Entry::connected(
+        Some("api.example.com:443"),
+        TIMED_OUT,
+        1,
+        Chat::default(),
+        None,
+        1,
+    );
+    assert!(!asked.is_kept_blocked());
+    assert!(!timed_out.is_kept_blocked());
+}

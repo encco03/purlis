@@ -278,6 +278,8 @@ pub const WINDOW_ONLY: &[&str] = &[
     // The first task's runs read back from the clone, each with its diff command (#945): the
     // window's First task tab alone.
     "first_task_started",
+    // What the person kept blocked here (#1700): their answers, read for the Inbox alone.
+    "sandbox_kept_blocked",
 ];
 
 /// **The commands of who may dispatch to whom**, by name (spec #1483): every one is on
