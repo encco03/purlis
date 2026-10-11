@@ -216,7 +216,9 @@ function holding(name: string, state: Ending["state"]): Ending {
 }
 
 describe("a restart to update (#1078)", () => {
-  it("costs three prompts over a chat mid-turn when it reopens them, the update's own dialog among them", async () => {
+  /** The update's dialog over a chat mid-turn, restarted with `after` picked in it: the
+   *  prompts it cost, and what the restart was told to put back. */
+  async function restartedWith(after: "Reopen every chat" | "Start fresh") {
     // Before the restart: the status line's button opens the update's dialog, and a chat
     // mid-turn is warned about. The dialog is counted although the operator opened it, as the
     // picker a New tab opens is: it is a dialog that waits for an answer (D-1078-2).
@@ -237,27 +239,41 @@ describe("a restart to update (#1078)", () => {
     );
     const person = userEvent.setup();
     await person.click(screen.getByTestId("status-update"));
-    await person.click(
-      within(await screen.findByRole("dialog")).getByRole("button", { name: "Restart to update" }),
-    );
+    const dialog = await screen.findByRole("dialog");
+    await person.click(within(dialog).getByRole("radio", { name: after }));
+    await person.click(within(dialog).getByRole("button", { name: "Restart to update" }));
     const warning = await screen.findByRole("alertdialog");
     await person.click(within(warning).getByRole("button", { name: "Restart now" }));
     expect(restart).toHaveBeenCalledTimes(1);
     const before = interrupts.asked();
     cleanup();
+    return { person, before, told: restart.mock.calls[0]?.[0] as unknown };
+  }
 
-    // After it: the new version's launch asks what to put back, and the chats reopen.
-    const { calls } = core((cmd) => (cmd === "relaunch_ask" ? RELAUNCH(true) : undefined));
+  it("costs two prompts over a chat mid-turn when it reopens them: the answer goes with the restart", async () => {
+    const { before, told } = await restartedWith("Reopen every chat");
+    expect(told).toBe("ReopenAll");
+
+    // After it: the core took the answer the restart carried, so there is nothing to ask.
+    const { calls } = core((cmd) => (cmd === "relaunch_ask" ? null : undefined));
     render(<App />);
-    const question = await screen.findByRole("alertdialog", { name: "Reopen your sessions?" });
-    expect(question).toHaveTextContent("purlis restarted to install an update");
-    await person.click(within(question).getByRole("button", { name: "Reopen all sessions" }));
     await waitFor(() => expect(calls("relaunch")).toHaveLength(1));
 
-    // The budget, spent to the last prompt: Start fresh here would ask a fourth, the picker
-    // (#1078's checklist carries that finding).
     expect(before).toEqual(["Updates", "Restart to update"]);
-    expect(interrupts.asked()).toEqual(["Updates", "Restart to update", "Reopen your sessions?"]);
+    expect(interrupts.asked()).toEqual(["Updates", "Restart to update"]);
+  });
+
+  it("costs three when it starts fresh, the last of them the chat's own picker", async () => {
+    const { person, told } = await restartedWith("Start fresh");
+    expect(told).toBe("StartFresh");
+
+    const { calls } = core((cmd) => (cmd === "relaunch_ask" ? null : undefined));
+    render(<App />);
+    await waitFor(() => expect(calls("relaunch")).toHaveLength(1));
+    await startAChat(person);
+    await vi.waitFor(() => expect(calls("start_chat")).toHaveLength(1));
+
+    expect(interrupts.asked()).toEqual(["Updates", "Restart to update", "Start a chat"]);
   });
 });
 

@@ -2,7 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { listen } from "./here";
 import { ArrowUpCircle, LoaderCircle, Pin } from "lucide-react";
-import { commands, type Offer, type PinReport, type PlaneId } from "./bindings";
+import {
+  commands,
+  type Offer,
+  type PinReport,
+  type PlaneId,
+  type RelaunchChoice,
+} from "./bindings";
 import { MidTurn, mightBeMidTurn, type Ending } from "./QuitWarning";
 import { ReleaseNotes } from "./ReleaseNotes";
 import { Choice, SettingActions, SettingRow } from "./settings/components";
@@ -26,9 +32,12 @@ import { AnswerBar } from "./AnswerBar";
  *
  * **Once it is installed the line says Restart to update** (charter-app#251), and that is the
  * way to finish. The core writes every project's record, saying a restart to update wrote it,
- * ends the chats and restarts; the launch after it asks #250's question — reopen every session
- * or start fresh — with "charter restarted to install an update." in it and Reopen all in
- * front. **A chat that is mid-turn is named first**, in the words the quit warning uses, with
+ * ends the chats and restarts. **What to put back is answered here, before the restart**
+ * (#1078): every chat reopened (in front, as the launch's own question has it) or a fresh
+ * start. The core carries the answer to the launch after the restart, which then asks
+ * nothing; a launch that does not follow it (the restart failed, charter started by hand)
+ * asks #250's question as before. **A chat that is mid-turn is named first**, in the words
+ * the quit warning uses, with
  * Wait as the answer a stray Return finds. Nothing here restarts charter behind the
  * operator's back.
  *
@@ -62,8 +71,9 @@ export type Updates = {
   check: () => void;
   install: () => void;
   choose: (channel: string) => void;
-  /** Restart into the installed update — once the operator has heard what is mid-turn. */
-  restart: () => void;
+  /** Restart into the installed update — once the operator has heard what is mid-turn. With
+   *  `after`, what the launch after it puts back, so it asks nothing (#1078). */
+  restart: (after?: RelaunchChoice) => void;
 };
 
 /**
@@ -173,9 +183,10 @@ export function useUpdates(): Updates {
     });
   }, []);
 
-  const restart = useCallback(() => {
-    void commands
-      .restartToUpdate()
+  const restart = useCallback((after?: RelaunchChoice) => {
+    void (
+      after === undefined ? commands.restartToUpdate() : commands.restartToUpdateChoosing(after)
+    )
       .then((done) => (done.status === "error" ? done.error : undefined))
       // A command that never reached the core is a refusal too, and says so in the same place.
       .catch((why: unknown) => `purlis could not ask to restart: ${String(why)}`)
@@ -216,11 +227,17 @@ function channels(current: string | undefined) {
   }));
 }
 
+/** What the launch after a restart to update puts back, as the update's dialog offers it. */
+const AFTER_RESTART: { value: RelaunchChoice; label: string }[] = [
+  { value: "ReopenAll", label: "Reopen every chat" },
+  { value: "StartFresh", label: "Start fresh" },
+];
+
 /** The sentence that has to be read before Install is pressed. */
 export const INSTALL_ENDS_SESSIONS =
   "Installing ends every running chat. On Windows purlis closes at once to install; on macOS " +
-  "and Linux the new version is put in place, and Restart to update ends every chat and offers " +
-  "to reopen them all when purlis starts again.";
+  "and Linux the new version is put in place, and Restart to update ends every chat and puts " +
+  "them all back when purlis starts again, or starts fresh, as you pick.";
 
 /**
  * The status line's update button, and the dialog it opens.
@@ -249,6 +266,8 @@ export function UpdateItem({
   const content = useRef<HTMLDivElement>(null);
   /** Whether the dialog is asking about the chats a restart would interrupt. */
   const [asking, setAsking] = useState(false);
+  /** What the launch after the restart puts back (#1078): every chat, unless picked. */
+  const [after, setAfter] = useState<RelaunchChoice>("ReopenAll");
   const { state, channel, check, install, choose, restart } = updates;
   // How the write went, read as soon as the props say (React's "adjusting state when a prop
   // changes", so the row never draws a stale pick for a frame).
@@ -272,7 +291,7 @@ export function UpdateItem({
   const midTurn = chats.filter(mightBeMidTurn);
   const words = said(state);
   const toRestart = () => {
-    if (midTurn.length === 0) return restart();
+    if (midTurn.length === 0) return restart(after);
     setOpen(false);
     setAsking(true);
   };
@@ -332,9 +351,9 @@ export function UpdateItem({
               ) : state.kind === "installed" ? (
                 <>
                   <p className="honest">
-                    purlis {state.version} is installed. Restart to update ends every chat, starts
-                    purlis {state.version}, and asks whether to reopen them — Reopen all puts each
-                    one back, resuming its conversation where its harness can.
+                    purlis {state.version} is installed. Restart to update ends every chat and
+                    starts purlis {state.version}. Reopen every chat puts each one back, resuming
+                    its conversation where its harness can; Start fresh puts none back.
                   </p>
                   {state.refused && (
                     <p className="honest doctor-trouble" role="alert">
@@ -372,6 +391,23 @@ export function UpdateItem({
                 />
               )}
             />
+            {state.kind === "installed" && (
+              <SettingRow
+                label="After the restart"
+                grouped
+                control={(ids) => (
+                  <Choice
+                    ids={ids}
+                    kind="radio"
+                    options={AFTER_RESTART}
+                    value={after}
+                    onValueChange={(to) =>
+                      setAfter(to === "StartFresh" ? "StartFresh" : "ReopenAll")
+                    }
+                  />
+                )}
+              />
+            )}
             {picked !== undefined && picked !== channel && (
               <SettingActions>
                 <button
@@ -432,7 +468,7 @@ export function UpdateItem({
           onWait={() => setAsking(false)}
           onRestart={() => {
             setAsking(false);
-            restart();
+            restart(after);
           }}
         />
       )}

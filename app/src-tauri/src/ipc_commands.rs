@@ -254,6 +254,7 @@ macro_rules! app_commands {
                 updates::check_for_update,
                 updates::install_update,
                 updates::restart_to_update,
+                updates::restart_to_update_choosing,
                 extensions::installed_extensions,
                 extensions::pick_extension,
                 extensions::install_extension,

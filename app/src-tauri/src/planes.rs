@@ -1473,6 +1473,10 @@ struct Relaunching {
     /// [`reopen::Record::relaunch_after_update`] counts only when this is set, which is what
     /// keeps a flag left in a plane nobody reopened from speaking at a later launch.
     after_update: bool,
+    /// What the person answered before that restart (#1078): this launch's answer, so the
+    /// question is not asked again ([`Planes::relaunch_ask`]) and [`Planes::relaunch`] takes
+    /// it over the window's "nothing to ask" default.
+    chosen: Option<Choice>,
 }
 
 /// What a launch would put back, for the question it asks before putting any of it back.
@@ -2163,7 +2167,8 @@ impl Planes {
     /// one read its own open makes, when it is actually put back (charter-app#123).
     pub fn relaunch_ask(&self, restoring: &[PathBuf]) -> Option<Relaunchable> {
         let relaunching = self.relaunching();
-        if relaunching.decided {
+        // Answered already: by the window, or before the restart that started this launch.
+        if relaunching.decided || relaunching.chosen.is_some() {
             return None;
         }
         let roots = self.launch_roots(&relaunching, restoring);
@@ -2209,6 +2214,9 @@ impl Planes {
                 return;
             }
             relaunching.decided = true;
+            // The answer given before the restart is the person's; the window's, with no
+            // question asked, is only the default (#1078).
+            let choice = relaunching.chosen.unwrap_or(choice);
             if choice == Choice::StartFresh {
                 relaunching.fresh = self
                     .launch_roots(&relaunching, restoring)
@@ -3022,9 +3030,16 @@ impl Planes {
     /// nothing; a flagged record with no word is an ordinary relaunch, which is the smaller
     /// wrong of the two if only one of the writes lands.
     pub fn let_go_of_all_to_update(&self) {
+        self.let_go_of_all_to_update_choosing(None);
+    }
+
+    /// [`Self::let_go_of_all_to_update`], with what the person answered before the restart:
+    /// every chat put back, or a fresh start (#1078). The launch after it takes that answer and
+    /// does not ask "Reopen your sessions?" again.
+    pub fn let_go_of_all_to_update_choosing(&self, chosen: Option<Choice>) {
         self.let_go_of_every_plane(true);
         if let Some(config) = self.config.as_deref()
-            && let Err(why) = reopen::mark_restart_to_update(config)
+            && let Err(why) = reopen::mark_restart_to_update_choosing(config, chosen)
         {
             tracing::warn!(
                 "purlis: the launch after this restart will not say it followed an update \
@@ -3605,10 +3620,12 @@ fn resolving_with(
     // launch after it and by no later one (charter-app#251). This runs once per process, from
     // `setup`: a second launch's arguments reach the running app through the single-instance
     // plugin and never come back through here to take the word a second time.
-    planes.relaunching().after_update = planes
-        .config
-        .as_deref()
-        .is_some_and(reopen::take_restart_to_update);
+    let restarted = planes.config.as_deref().and_then(reopen::take_restart);
+    {
+        let mut relaunching = planes.relaunching();
+        relaunching.after_update = restarted.is_some();
+        relaunching.chosen = restarted.and_then(|restart| restart.chosen);
+    }
     let cwd = match cwd {
         Ok(cwd) => cwd,
         // Nothing to go on at all. Not an error: an app launched from an icon has no useful
@@ -5281,6 +5298,43 @@ mod tests {
                 .expect("there is something to ask about")
                 .after_update
         );
+    }
+
+    /// #1078: the answer given before the restart is this launch's. Nothing is asked, and the
+    /// window's "nothing to ask" answer does not overrule it.
+    #[test]
+    fn the_launch_after_a_restart_that_was_told_to_start_fresh_asks_nothing_and_starts_fresh() {
+        let dir = tempfile::tempdir().expect("a directory");
+        let config = dir.path().join("config");
+        let root = a_plane(&dir.path().join("plane"));
+        flagged_by_a_restart(&root);
+        reopen::mark_restart_to_update_choosing(&config, Some(Choice::StartFresh))
+            .expect("the restart is marked");
+
+        let planes = launched_in(&config, &root);
+
+        assert!(planes.relaunch_ask(&[]).is_none(), "it asked again");
+        planes.relaunch(Choice::ReopenAll, &[]);
+        let after = reopen::read_or_refusal(&root).expect("the record reads");
+        assert!(
+            !after.holds_anything(),
+            "the answer before the restart was not taken: {after:?}"
+        );
+    }
+
+    #[test]
+    fn the_launch_after_a_restart_that_was_told_to_reopen_asks_nothing() {
+        let dir = tempfile::tempdir().expect("a directory");
+        let config = dir.path().join("config");
+        let root = a_plane(&dir.path().join("plane"));
+        flagged_by_a_restart(&root);
+        reopen::mark_restart_to_update_choosing(&config, Some(Choice::ReopenAll))
+            .expect("the restart is marked");
+
+        let planes = launched_in(&config, &root);
+
+        assert!(planes.relaunch_ask(&[]).is_none(), "it asked again");
+        assert!(planes.restarted_to_update());
     }
 
     #[test]

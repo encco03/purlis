@@ -1746,6 +1746,12 @@ export const commands = {
 	 */
 	restartToUpdate: () => typedError<null, string>(__TAURI_INVOKE("restart_to_update")),
 	/**
+	 *  **Restart to update, with what to put back already answered** (#1078): the window's
+	 *  update dialog asks it before the restart, so the launch after it asks nothing. Otherwise
+	 *  [`restart_to_update`].
+	 */
+	restartToUpdateChoosing: (choice: RelaunchChoice) => typedError<null, string>(__TAURI_INVOKE("restart_to_update_choosing", { choice })),
+	/**
 	 *  What has contributed what to this window.
 	 * 
 	 *  It reads the disk — every installed extension's whole directory, to re-take the fingerprint
