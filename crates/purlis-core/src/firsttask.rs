@@ -18,7 +18,9 @@
 //!   prompt charter types);
 //! - [`label`]: what each run's chat is called, which names its branch;
 //! - [`cut_from`] and [`diff_command`]: the commit a chat's branch was cut from, and what shows
-//!   the chat's diff against it, in a shell tab in its branch's folder.
+//!   the chat's diff against it, in a shell tab in its branch's folder;
+//! - [`branch`] and [`cut_from_recorded`]: the same, read back from the clone for a run started
+//!   before this launch (#945).
 //!
 //! **The task writes only in the run's own branch.** Each run's chat starts in a piece cut off
 //! the workspace's clone (GL-1), the clone is charter's copy and not the operator's repo
@@ -35,6 +37,12 @@ pub const RUNS: u8 = 2;
 /// (`first-task-1`), by the rule every labelled chat's branch is named by.
 pub fn label(run: u8) -> String {
     format!("first task {run}")
+}
+
+/// The branch run `run` works on: [`label`] as every labelled chat's branch is named
+/// (`first-task-1`). What a relaunched window looks for in the clone to know the run started.
+pub fn branch(run: u8) -> String {
+    crate::worktree::name::slug(&label(run)).unwrap_or_else(|| format!("first-task-{run}"))
 }
 
 /// The task, as it is typed into each run's chat.
@@ -72,6 +80,28 @@ pub fn cut_from(tree: &Path) -> Result<String, String> {
         return Err(format!(
             "git did not say which commit {} starts at: {}",
             tree.display(),
+            said.err.trim()
+        ));
+    }
+    Ok(sha.to_owned())
+}
+
+/// [`cut_from`] for a run started before this launch (#945): where `branch` meets the branch it
+/// was cut from, as the clone recorded that at the cut (ADR 0027), asked in `tree`, any folder
+/// of the clone. The same commit [`cut_from`] answered at the start, unless the base branch was
+/// rewritten or has merged `branch` since; a run's diff is then shorter than what it did, never
+/// another branch's.
+pub fn cut_from_recorded(tree: &Path, branch: &str) -> Result<String, String> {
+    let base = crate::worktree::recorded_base(tree, branch).ok_or_else(|| {
+        format!("purlis has no record of which branch {branch} was cut from, so its diff cannot be shown.")
+    })?;
+    let said = git::run(tree, &["merge-base", branch, &base], git::READ).map_err(|why| {
+        format!("purlis could not ask git where {branch} was cut from {base} ({why}).")
+    })?;
+    let sha = said.line();
+    if !said.ok() || sha.is_empty() || !sha.chars().all(|c| c.is_ascii_hexdigit()) {
+        return Err(format!(
+            "git did not say where {branch} was cut from {base}: {}",
             said.err.trim()
         ));
     }
@@ -126,6 +156,74 @@ mod tests {
                 "{harness:?}"
             );
         }
+    }
+
+    #[test]
+    fn each_run_works_on_the_branch_its_label_names() {
+        assert_eq!(branch(1), "first-task-1");
+        assert_eq!(branch(2), "first-task-2");
+    }
+
+    #[test]
+    fn a_run_started_before_this_launch_diffs_against_the_commit_it_was_cut_from() {
+        let dir = tempfile::tempdir().unwrap();
+        let repo = dir.path();
+        let git = |args: &[&str]| {
+            let said = git::run(repo, args, git::READ).unwrap();
+            assert!(said.ok(), "git {args:?}: {}", said.err);
+            said.line().to_owned()
+        };
+        git(&["init", "-q", "-b", "main"]);
+        git(&[
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "one",
+        ]);
+        let cut = git(&["rev-parse", "HEAD"]);
+        git(&["branch", "first-task-1"]);
+        git(&["config", "branch.first-task-1.charterBase", "main"]);
+        // The run commits on its branch, and the base moves on without it.
+        git(&["checkout", "-q", "first-task-1"]);
+        git(&[
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "run",
+        ]);
+        git(&["checkout", "-q", "main"]);
+        git(&[
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "later",
+        ]);
+        assert_eq!(cut_from_recorded(repo, "first-task-1"), Ok(cut));
+    }
+
+    #[test]
+    fn a_branch_with_no_recorded_base_has_no_diff_and_says_why() {
+        let dir = tempfile::tempdir().unwrap();
+        let why = cut_from_recorded(dir.path(), "first-task-2").unwrap_err();
+        assert!(
+            why.contains("no record of which branch first-task-2 was cut from"),
+            "{why}"
+        );
     }
 
     #[test]

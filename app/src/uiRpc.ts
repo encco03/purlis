@@ -3881,6 +3881,28 @@ export type FirstTaskRun = {
 };
 
 /**
+ *  A run of the first task that started before this launch, read back from the clone (#945):
+ *  its branch is there, whatever the window remembers.
+ */
+export type FirstTaskStarted = {
+	/**  Which run: 1 or 2. */
+	run: number,
+	/**  The branch it works on. */
+	branch: string,
+	/**  The branch's folder, where its diff is shown. */
+	folder: string,
+	/**  The workspace it is filed under. */
+	workspace: string | null,
+	/**
+	 *  The command that shows the run's diff, run in `folder`, as [`FirstTaskRun::diff`] says
+	 *  it. Null when the commit it was cut from cannot be read back; `no_diff` then says why.
+	 */
+	diff: string | null,
+	/**  Why the run's diff cannot be shown. Null when `diff` is set. */
+	no_diff: string | null,
+};
+
+/**
  *  The branch the window's sidebar is focused on — its cockpit (FM-5): a workspace, a repo,
  *  and a branch's folder, or none for the repo's own. Names only.
  */

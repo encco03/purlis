@@ -149,6 +149,67 @@ pub fn start(
     })
 }
 
+/// A run of the first task that started before this launch, read back from the clone (#945):
+/// its branch is there, whatever the window remembers.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, specta::Type)]
+pub struct FirstTaskStarted {
+    /// Which run: 1 or 2.
+    pub run: u8,
+    /// The branch it works on.
+    pub branch: String,
+    /// The branch's folder, where its diff is shown.
+    pub folder: String,
+    /// The workspace it is filed under.
+    pub workspace: Option<String>,
+    /// The command that shows the run's diff, run in `folder`, as [`FirstTaskRun::diff`] says
+    /// it. Null when the commit it was cut from cannot be read back; `no_diff` then says why.
+    pub diff: Option<String>,
+    /// Why the run's diff cannot be shown. Null when `diff` is set.
+    pub no_diff: Option<String>,
+}
+
+/// The first task's runs that started before this launch in `repo`'s clone in `workspace`:
+/// each whose branch is in the clone, with the command that shows its diff.
+#[tauri::command]
+#[specta::specta]
+pub async fn first_task_started(
+    planes: tauri::State<'_, Planes>,
+    plane: PlaneId,
+    workspace: String,
+    repo: String,
+) -> Result<Vec<FirstTaskStarted>, String> {
+    let root = planes.held(&plane)?.root().to_path_buf();
+    tauri::async_runtime::spawn_blocking(move || started(&root, &workspace, &repo))
+        .await
+        .map_err(|why| format!("purlis could not list the first task's branches: {why}"))?
+}
+
+/// [`first_task_started`], against a root the registry has already vouched for.
+fn started(root: &Path, workspace: &str, repo: &str) -> Result<Vec<FirstTaskStarted>, String> {
+    let pieces =
+        purlis_core::worktree::list(root, workspace, repo).map_err(|why| why.in_window())?;
+    Ok((1..=firsttask::RUNS)
+        .filter_map(|run| {
+            let branch = firsttask::branch(run);
+            let piece = pieces
+                .iter()
+                .find(|one| one.prunable.is_none() && one.branch.as_deref() == Some(&branch))?;
+            let (diff, no_diff) = match firsttask::cut_from_recorded(&piece.path, &branch) {
+                Ok(from) => (Some(firsttask::diff_command(&from)), None),
+                Err(why) => (None, Some(why)),
+            };
+            Some(FirstTaskStarted {
+                run,
+                branch,
+                folder: piece.path.display().to_string(),
+                workspace: Some(workspace.to_owned()),
+                diff,
+                no_diff,
+            })
+        })
+        .collect())
+}
+
 /// When a run's harness can have the task typed into it, or why not: the line its capability
 /// card says for it (HP-19, ADR 0072 §3).
 fn cannot_type(
@@ -280,6 +341,43 @@ mod tests {
         assert_eq!(opened.label.as_deref(), Some("first task 1"));
         assert!(held.typed().waiting(run.session), "held until it starts");
         held.close_chat(run.session).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_run_started_before_this_launch_is_read_back_with_the_same_diff() {
+        let project = Project::new("claude");
+        let planes = planes();
+        let id = planes.open(&project.root);
+        let held = planes.held(&id).expect("held");
+        let run =
+            start(&held, None, &project.clone, "work".into(), None, 1, SIZE).expect("it starts");
+        held.close_chat(run.session).unwrap();
+        // The clone's branch moves on, as it does while the run works.
+        git(
+            &project.clone,
+            &["commit", "-q", "--allow-empty", "-m", "later"],
+        );
+
+        let found = started(&project.root, "shop", "shop").expect("it lists");
+
+        assert_eq!(
+            found,
+            vec![FirstTaskStarted {
+                run: 1,
+                branch: "first-task-1".into(),
+                folder: run.folder.clone(),
+                workspace: Some("shop".into()),
+                diff: Some(run.diff.clone()),
+                no_diff: None,
+            }]
+        );
+    }
+
+    #[test]
+    fn a_clone_with_no_run_started_has_none() {
+        let project = Project::new("claude");
+        assert_eq!(started(&project.root, "shop", "shop"), Ok(Vec::new()));
     }
 
     #[test]

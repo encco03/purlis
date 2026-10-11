@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
+import { userEvent } from "@testing-library/user-event";
 import { FirstTaskTab, type FirstTaskDoes } from "./FirstTaskTab";
 
 /**
@@ -58,26 +59,26 @@ const NO_CODEX = {
   local_models: [],
 };
 
-const piece = (name: string, branch: string | null, stale = false) => ({
-  piece: name,
-  path: `${PLANE}/workspaces/widget/.worktrees/widget/${name}`,
-  branch,
-  wired: true,
-  stale,
-  said: "",
-  unclaimed: null,
+/** A run the core read back from the clone (`first_task_started`). */
+const onDisk = (run: number, diff: string | null = `git add -N -A && git diff c${run} --`) => ({
+  run,
+  branch: `first-task-${run}`,
+  folder: `${PLANE}/workspaces/widget/.worktrees/widget/first-task-${run}`,
+  workspace: "widget",
+  diff,
+  no_diff: diff === null ? "purlis has no record of which branch it was cut from." : null,
 });
 
 function machine({
   found = NO_CODEX as unknown,
-  pieces = [] as unknown,
-}: { found?: unknown; pieces?: unknown } = {}) {
+  started = [] as unknown,
+}: { found?: unknown; started?: unknown } = {}) {
   const asked: { cmd: string; args: Record<string, unknown> }[] = [];
   mockIPC((cmd, args) => {
     asked.push({ cmd, args: (args ?? {}) as Record<string, unknown> });
     if (cmd === "start_options") return START_OPTIONS;
     if (cmd === "harness_setup_found") return found;
-    if (cmd === "worktree_list") return pieces;
+    if (cmd === "first_task_started") return started;
     return null;
   });
   return { calls: (cmd: string) => asked.filter((one) => one.cmd === cmd) };
@@ -136,7 +137,7 @@ describe("the First task tab, on this machine (#1698)", () => {
     mockIPC((cmd) => {
       if (cmd === "start_options") return START_OPTIONS;
       if (cmd === "harness_setup_found") throw "purlis could not look at this machine";
-      if (cmd === "worktree_list") return [];
+      if (cmd === "first_task_started") return [];
       return null;
     });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
@@ -150,7 +151,7 @@ describe("the First task tab, on this machine (#1698)", () => {
     mockIPC((cmd) => {
       if (cmd === "start_options") return START_OPTIONS;
       if (cmd === "harness_setup_found") throw "the probe was refused";
-      if (cmd === "worktree_list") return [];
+      if (cmd === "first_task_started") return [];
       return null;
     });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
@@ -166,7 +167,7 @@ describe("the First task tab, on this machine (#1698)", () => {
     mockIPC((cmd) => {
       if (cmd === "start_options") return START_OPTIONS;
       if (cmd === "harness_setup_found") return NO_CODEX;
-      if (cmd === "worktree_list") throw "git is not on PATH";
+      if (cmd === "first_task_started") throw "git is not on PATH";
       return null;
     });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
@@ -184,7 +185,7 @@ describe("the First task tab, on this machine (#1698)", () => {
     mockIPC((cmd) => {
       if (cmd === "start_options") return START_OPTIONS;
       if (cmd === "harness_setup_found") return look;
-      if (cmd === "worktree_list") return [];
+      if (cmd === "first_task_started") return [];
       return null;
     });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
@@ -212,7 +213,7 @@ describe("the First task tab, on this machine (#1698)", () => {
           ],
         };
       if (cmd === "harness_setup_found") return NO_CODEX;
-      if (cmd === "worktree_list") return [];
+      if (cmd === "first_task_started") return [];
       return null;
     });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
@@ -226,9 +227,7 @@ describe("the First task tab, on this machine (#1698)", () => {
 
 describe("the First task tab after a relaunch (#945)", () => {
   it("shows a chat whose branch is in the clone as started, and offers no second start", async () => {
-    const { calls } = machine({
-      pieces: [piece("first-task-1", "first-task-1"), piece("fix-login", "fix-login")],
-    });
+    const { calls } = machine({ started: [onDisk(1)] });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
 
     const first = runSection("First chat");
@@ -242,15 +241,48 @@ describe("the First task tab after a relaunch (#945)", () => {
     expect(
       within(runSection("Second chat")).getByRole("button", { name: "Start the second chat" }),
     ).toBeInTheDocument();
-    expect(calls("worktree_list")[0].args).toEqual({
+    expect(calls("first_task_started")[0].args).toEqual({
       plane: PLANE,
       workspace: "widget",
       repo: "widget",
     });
   });
 
-  it("offers Start for a branch git no longer has a folder for", async () => {
-    machine({ pieces: [piece("first-task-1", "first-task-1", true)] });
+  it("shows the diff of a chat started before this launch, as the core says it", async () => {
+    machine({ started: [onDisk(1)] });
+    const shown: unknown[] = [];
+    render(
+      <FirstTaskTab
+        plane={PLANE}
+        clone={CLONE}
+        does={{ ...DOES, showDiff: (run) => shown.push(run) }}
+      />,
+    );
+
+    const first = runSection("First chat");
+    await userEvent.click(await within(first).findByRole("button", { name: "Show its diff" }));
+    expect(shown).toEqual([
+      {
+        folder: `${PLANE}/workspaces/widget/.worktrees/widget/first-task-1`,
+        workspace: "widget",
+        diff: "git add -N -A && git diff c1 --",
+      },
+    ]);
+  });
+
+  it("says why a chat started before this launch has no diff", async () => {
+    machine({ started: [onDisk(2, null)] });
+    render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
+
+    const second = runSection("Second chat");
+    expect(
+      await within(second).findByText(/purlis has no record of which branch it was cut from/),
+    ).toBeInTheDocument();
+    expect(within(second).queryByRole("button", { name: "Show its diff" })).not.toBeInTheDocument();
+  });
+
+  it("offers Start when the core read back no run", async () => {
+    machine({ started: [] });
     render(<FirstTaskTab plane={PLANE} clone={CLONE} does={DOES} />);
 
     await screen.findByRole("radiogroup", { name: "First chat" });
@@ -263,7 +295,7 @@ describe("the First task tab after a relaunch (#945)", () => {
   });
 
   it("keeps the run this launch started, with its diff, over what the disk says", async () => {
-    machine({ pieces: [piece("first-task-1", "first-task-1")] });
+    machine({ started: [onDisk(1)] });
     const run = {
       session: 11,
       name: "11",

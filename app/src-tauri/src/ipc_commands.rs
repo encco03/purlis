@@ -114,6 +114,7 @@ macro_rules! app_commands {
                 firstrun::repo_instructions,
                 firstrun::import_instructions,
                 firsttask::first_task_run,
+                firsttask::first_task_started,
                 open_session,
                 open_shell_in_branch,
                 close_session,
