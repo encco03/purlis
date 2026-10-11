@@ -19,6 +19,8 @@ What is still to be measured needs a person with the phone: §1's second half, a
 - A Tauri 2 iOS app linked them and listed a host's chats over Wi-Fi through Noise XX: *pending
   the phone run*. The same link works process-to-process on the Mac (the host's five tests and the
   phone library's two).
+- nix has a second iOS-broken use behind its `net` feature (`UtunIfname`, `sockopt.rs`, the same
+  `SYSPROTO_CONTROL` under `apple_targets`). It is not enabled here; Phase 1 should not enable it.
 - A detail Phase 1 inherits: the protocol crate's client side on iOS still links `same-user`
   (`proc_pidinfo`, unix-socket peer checks) that a phone never calls. Whether to cfg that out is a
   question for upstream, not a blocker.
@@ -37,10 +39,23 @@ spec's rule applies: the level-2 screen is timeline-only with "View on desktop".
 
 Locking the phone mid-burst and reopening: pending.
 
-A fact from building it: the host must pace a burst on the view's queue (the bench's
-`SOURCE_PAUSE`, 256 KiB), because `Feed::push` drops a view as `FellBehind` past
-`Limits::most_queued_bytes` (1 MiB). A PTY paces a real harness the same way, so the gateway
-inherits this for free; a synthetic source does not.
+Two facts from building it, both about `session-protocol::view` as the gateway will meet it:
+
+- A source must pace on the view's queue (the bench's `SOURCE_PAUSE`, 256 KiB), because
+  `Feed::push` drops a view as `FellBehind` past `Limits::most_queued_bytes` (1 MiB). A PTY paces
+  a real harness the same way, so the gateway inherits this for free; a synthetic source does not.
+- `Feed` gives no signal when the view's writer is gone (only `FellBehind` and `OverAcknowledged`
+  close it). A paced source whose client vanished, which is what an iOS suspend looks like, would
+  wait for ever; the spike's host gives up after 2 s without the queue draining. The gateway's
+  source is a PTY, which keeps writing and so trips `FellBehind`, but a Phase 1 test should pin
+  that a suspended phone's view is dropped and re-attached, not held.
+
+How the phone measures, so the numbers can be read: the host's acks are sent only from xterm's
+write callback (what the protocol means by "drawn"), the renderer is WebGL with the DOM renderer as
+the fallback and the status line says which drew, the longest-frame figure counts from one frame
+after the terminal opened until the burst has been quiet for 2 s, and the tap probe records the
+worst pointer-to-next-frame latency rather than a count. Only one pane is drawn, so "other panes
+responsive" is not measured.
 
 ## 3. A prompt pasted mid-turn
 
