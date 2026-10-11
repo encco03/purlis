@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791716722487,
+  "lastUpdate": 1791720444690,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7476,6 +7476,48 @@ window.BENCHMARK_DATA = {
             "value": 103.7687405,
             "unit": "ms",
             "extra": "median of 5 runs: 103.381, 103.543, 103.769, 104.263, 104.975 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "38c275e03f42641f037f7efb9be9434dd7e6d3d3",
+          "message": "Draw the last hand-built form controls with the settings set\n\nThe design set's guard listed six files whose form controls were native\nand should have been the set's Field or Choice. Each is moved, and the\nguard's debt list is gone: a native input, select or textarea outside\nthe set is now either the surface itself, named with why, or a failure.\n\n- The set learns `chips` (any of a few over a list, one Tab stop with\n  the arrows between them) and a control with no row: `RowIds.label`\n  names it and `RowIds.title` carries its help, for a table's cell or a\n  pick inside a sentence. A select's option can be out of reach, and a\n  text field takes `inputMode` and `size`.\n- The Chats list's state chips are the set's chips; the dispatch\n  question's where-it-holds radios a Choice radio; the grant table's and\n  Add a grant's five selects Choice selects; the limits table's boxes\n  and the folder box Fields; and the host or folder to allow for a\n  sandbox block that named none a Field in a form row under its Notice.\n- Every moved control keeps its name, keyboard and tests; the busy\n  window tests pass unchanged.\n\nRefs #626\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T15:56:32+04:00",
+          "tree_id": "6be42382ed6f2e0501eaebb4aefd7b9fbec5d94b",
+          "url": "https://github.com/purlis/purlis/commit/38c275e03f42641f037f7efb9be9434dd7e6d3d3"
+        },
+        "date": 1791720443515,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.419597,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.407, 0.413, 0.420, 0.431, 0.437 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.471141,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.360, 16.405, 16.471, 16.604, 16.864 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.3981075,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.731, 101.366, 101.398, 101.967, 102.261 ms"
           }
         ]
       }
