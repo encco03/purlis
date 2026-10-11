@@ -487,11 +487,32 @@ impl Scan<'_> {
                 }
             }
         }
+        let folders = read
+            .search
+            .map(|search| search_folders(search, &read.words))
+            .unwrap_or_default();
         for word in read.words {
             self.word(&word, bases, depth, read.runner);
         }
         for file in read.files {
             self.file_word(&file, bases, read.runner);
+            if !file.searched || !looked_up(&file.value) {
+                continue;
+            }
+            // Where the program also looks a bare name up (#1425): named as a file in each
+            // folder of its search path, as it is in the folders the command runs in. An
+            // absolute folder is held to where a chat could write, as a value after `=` is.
+            for folder in &folders {
+                let folder = self.substituted(folder);
+                if folder.starts_with('/') && !self.holds(&folder) {
+                    continue;
+                }
+                let along = FileWord {
+                    value: format!("{}/{}", folder.trim_end_matches('/'), file.value),
+                    ..file.clone()
+                };
+                self.file_word(&along, bases, read.runner);
+            }
         }
         if let Some(depth) = depth.checked_sub(1) {
             for text in read.commands {
@@ -540,6 +561,7 @@ impl Scan<'_> {
         let file = |value: &str| FileWord {
             value: value.to_owned(),
             finds: Finds::Exact,
+            searched: false,
         };
         match carries {
             Carries::Path => self.file_word(&file(value), bases, runner),
@@ -774,6 +796,15 @@ impl Scan<'_> {
                     if !value.starts_with('/') || self.holds(value) {
                         taken.push((value.to_owned(), true));
                     }
+                    // A colon list (`PYTHONPATH=./a:./b`, `NODE_PATH=lib:tools`): each part as a
+                    // value of its own, held the same way, beside the value whole (#1425).
+                    if value.contains(':') && !value.contains("://") {
+                        for part in value.split(':').filter(|part| !part.is_empty()) {
+                            if !part.starts_with('/') || self.holds(part) {
+                                taken.push((part.to_owned(), true));
+                            }
+                        }
+                    }
                 }
             }
             // And what follows a short option's letter, `=` and all (D-1418-4).
@@ -925,6 +956,8 @@ struct Read {
     runner: bool,
     /// Words the program opens as a file of code ([`LOADS`]).
     files: Vec<FileWord>,
+    /// The search path the program also looks those up along ([`Search`]).
+    search: Option<Search>,
 }
 
 /// A change of the folder later commands run in.
@@ -1282,6 +1315,7 @@ fn read_segment(segment: &[String]) -> Read {
     read.runner = RUNNERS.contains(&name)
         || (matches!(name, "go" | "uv") && rest.first().is_some_and(|word| word == "run"));
     read.files = files_of(name, rest);
+    read.search = search_of(name);
     let mut words = rest.iter();
     if name == "popd" {
         read.moves.push(Move {
@@ -1382,6 +1416,69 @@ enum Finds {
 struct FileWord {
     value: String,
     finds: Finds,
+    /// An option's value, which the program also looks for along its search path where it is
+    /// a bare name ([`Search`]); never the script operand.
+    searched: bool,
+}
+
+/// The search path a program also looks a bare name up along, past the folder it runs in
+/// (#1425): Node's `NODE_PATH` for what it is asked to load first (`-r`, `--import`), gawk's
+/// `AWKPATH` for `-f` and `-i`, and Ruby's `-I` folders for `-r`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Search {
+    /// `NODE_PATH`, a colon list.
+    Node,
+    /// `AWKPATH`, a colon list.
+    Awk,
+    /// Ruby's own `-I<folder>` options, each one with a `/` (a bare `-I lib` stays unnamed,
+    /// D-1418-1).
+    Ruby,
+}
+
+/// The search path the program `name` follows, if it is one purlis reads ([`Search`]).
+fn search_of(name: &str) -> Option<Search> {
+    match name {
+        "node" | "ts-node" | "tsx" => Some(Search::Node),
+        "awk" | "gawk" | "mawk" | "nawk" => Some(Search::Awk),
+        "ruby" => Some(Search::Ruby),
+        _ => None,
+    }
+}
+
+/// The folders, as written, `search` reads off a command's `words`: the variable's colon list,
+/// set in front of the command or by a launcher (`env NODE_PATH=./lib node …`), or Ruby's `-I`
+/// options, attached (`-I./lib`) or apart (`-I ./lib`).
+fn search_folders(search: Search, words: &[String]) -> Vec<String> {
+    let variable = match search {
+        Search::Node => "NODE_PATH",
+        Search::Awk => "AWKPATH",
+        Search::Ruby => {
+            let mut out = Vec::new();
+            let mut words = words.iter();
+            while let Some(word) = words.next() {
+                let folder = match word.strip_prefix("-I") {
+                    Some("") => words.next().cloned(),
+                    Some(folder) => Some(folder.to_owned()),
+                    None => None,
+                };
+                out.extend(folder.filter(|folder| folder.contains('/')));
+            }
+            return out;
+        }
+    };
+    words
+        .iter()
+        .filter_map(|word| word.strip_prefix(variable)?.strip_prefix('='))
+        .flat_map(|list| list.split(':'))
+        .filter(|folder| !folder.is_empty())
+        .map(str::to_owned)
+        .collect()
+}
+
+/// Whether a program looks `value` up along its search path: a bare name or a package path
+/// (`hook`, `pkg/register`), not one written from a folder (`./hook`, `/opt/hook`, `~/hook`).
+fn looked_up(value: &str) -> bool {
+    !value.is_empty() && !value.starts_with(['.', '/', '~', '$'])
 }
 
 /// What Node, and the runners that load as it does, try after a name given without its
@@ -1654,6 +1751,7 @@ fn files_of(name: &str, rest: &[String]) -> Vec<FileWord> {
                 out.push(FileWord {
                     value: script.clone(),
                     finds,
+                    searched: false,
                 });
             }
             break;
@@ -1668,6 +1766,7 @@ fn files_of(name: &str, rest: &[String]) -> Vec<FileWord> {
                     out.push(FileWord {
                         value,
                         finds: *finds,
+                        searched: true,
                     });
                 }
             } else if loads.ends_long.contains(&flag.as_str()) {
@@ -1695,6 +1794,7 @@ fn files_of(name: &str, rest: &[String]) -> Vec<FileWord> {
                     out.extend(value.map(|value| FileWord {
                         value,
                         finds: *finds,
+                        searched: true,
                     }));
                     if *script {
                         return out;
@@ -1732,6 +1832,7 @@ fn files_of(name: &str, rest: &[String]) -> Vec<FileWord> {
             out.push(FileWord {
                 value: word.clone(),
                 finds,
+                searched: false,
             });
             break;
         }
@@ -2731,6 +2832,63 @@ mod tests {
         let found = named_in(&project, &project, "X=./hook Y=./target z --t=./target");
         assert!(found.contains(&repo.join("hook")), "{found:?}");
         assert!(!found.contains(&repo.join("target")), "{found:?}");
+    }
+
+    #[test]
+    fn a_colon_list_is_named_part_by_part() {
+        // #1425: each part of `PYTHONPATH=./a:./b` is a value of its own, held as one is.
+        for (command, want) in [
+            ("PYTHONPATH=./a.zip:./b.zip python3 x.py", "a.zip"),
+            ("PYTHONPATH=./a.zip:./b.zip python3 x.py", "b.zip"),
+            ("X=./tools/h.sh:./tools/g.sh y", "tools/g.sh"),
+            ("env NODE_PATH=lib:./tools/reg.js node s.js", "tools/reg.js"),
+        ] {
+            let (dir, found) = named_by_hook(command);
+            assert!(found.contains(&dir.join(want)), "{command}: {found:?}");
+        }
+        // A folder in one is a search path, never denied, as a single one is (D-1418-10).
+        let (dir, found) = named_by_hook("PYTHONPATH=./src:./lib python3 -c 'import x'");
+        for not in ["src", "lib"] {
+            assert!(!found.contains(&dir.join(not)), "{found:?}");
+        }
+        // An absolute part is held to where a chat could write, as a whole value is.
+        let found = named_at_home("X=/opt/a.sh:/home/op/b.sh y");
+        assert!(!found.contains(&PathBuf::from("/opt/a.sh")), "{found:?}");
+        assert!(found.contains(&PathBuf::from("/home/op/b.sh")), "{found:?}");
+    }
+
+    #[test]
+    fn a_bare_name_is_also_named_along_the_search_path_its_runner_follows() {
+        // #1425: `NODE_PATH`, `AWKPATH` and Ruby's `-I` with a `/`.
+        for (command, want) in [
+            ("NODE_PATH=./lib node -r hook s.js", "lib/hook.js"),
+            ("NODE_PATH=./lib node --require=hook s.js", "lib/hook.cjs"),
+            ("env NODE_PATH=./a:./b node --import reg s.js", "b/reg.mjs"),
+            (
+                "NODE_PATH=lib tsx -r pkg/register s.ts",
+                "lib/pkg/register.ts",
+            ),
+            ("AWKPATH=./awk gawk -f sum data", "awk/sum.awk"),
+            (
+                "AWKPATH=./awk:./more gawk -i util -f x.awk d",
+                "more/util.awk",
+            ),
+            ("ruby -I./rlib -r x y.rb", "rlib/x.rb"),
+            ("ruby -I ./rlib -rx y.rb", "rlib/x.so"),
+        ] {
+            let (dir, found) = named_by_hook(command);
+            assert!(found.contains(&dir.join(want)), "{command}: {found:?}");
+        }
+        // A name written from a folder is not looked up, and a bare `-I lib` stays unread
+        // (D-1418-1); a script operand is never looked up along it.
+        for (command, not) in [
+            ("NODE_PATH=./lib node -r ./hook s.js", "lib/hook.js"),
+            ("ruby -Ilib -r x y.rb", "lib/x.rb"),
+            ("NODE_PATH=./lib node s.js", "lib/s.js"),
+        ] {
+            let (dir, found) = named_by_hook(command);
+            assert!(!found.contains(&dir.join(not)), "{command}: {found:?}");
+        }
     }
 
     #[test]

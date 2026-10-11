@@ -64,7 +64,8 @@
 //! the reason that module's header gives: reading it once is what keeps five decisions from
 //! drifting apart.
 
-use crate::heredoc;
+use crate::consentspelling::{self, Nested};
+use crate::heredoc::{self, Heredocs};
 use crate::leakguard;
 use crate::livesub;
 use crate::memstore::is_python_space;
@@ -337,12 +338,17 @@ pub fn as_the_shell_reads(text: &str) -> String {
 /// **Not recursive**: a string inside that string is not opened, and a heredoc fed to a shell
 /// (`bash <<'EOF'`) is not either — that one is [`handoff_line`]'s, through the shared plan.
 pub fn shell_string_handoff(cmd: &str) -> bool {
+    shell_string_handoff_in(&heredoc::strip_reader_heredocs(cmd))
+}
+
+/// [`shell_string_handoff`] of a command with its reader heredocs already stripped.
+fn shell_string_handoff_in(stripped: &str) -> bool {
     // The STRIPPED text, not A7's line view: a quoted string that spans lines carries a `<<`
     // the header regex counts and the lexer cannot, so its lines are filed as a body nobody
     // executes and A7 skips them — which is right for a commit message and would hide the very
     // string this looks into (`eval "charter handoff b <<'BRIEF'` …). Nothing is dropped from
     // that text when the plan is unknown, so the whole call is here to lex.
-    let Ok(toks) = shellseg::lex(&heredoc::strip_reader_heredocs(cmd)) else {
+    let Ok(toks) = shellseg::lex(stripped) else {
         return false;
     };
     let toks = shellseg::split_punctuation(toks);
@@ -403,9 +409,13 @@ pub fn handoff_segment(toks: &[Tok]) -> (Option<Vec<Tok>>, bool) {
 /// ends off the WHOLE text, and only what follows it is looked at. A row that the string
 /// covers entirely is skipped; a row where the string closes is judged from the close on.
 pub fn handoff_line(cmd: &str) -> Option<(String, bool)> {
-    let rows = leakguard::lines_a_command_could_run(cmd);
-    let heads = quoted_row_prefixes(&rows);
-    let live = live_text_in_heads(&rows, &heads);
+    handoff_line_in(&leakguard::lines_a_command_could_run(cmd))
+}
+
+/// [`handoff_line`] over `rows`, the lines a command could run, already read.
+fn handoff_line_in(rows: &[(String, bool)]) -> Option<(String, bool)> {
+    let heads = quoted_row_prefixes(rows);
+    let live = live_text_in_heads(rows, &heads);
     let mut i = 0usize;
     while i < rows.len() {
         let (row, in_a_shells_body) = rows[i].clone();
@@ -525,6 +535,79 @@ fn trailing_backslashes(line: &str) -> usize {
 }
 
 // ----------------------------------------------------------------------------------------
+// a branch, a body, or a string further in (#1419, #1426)
+// ----------------------------------------------------------------------------------------
+
+/// Where a handoff further in than the line reading sits, as a refusal says it.
+const FURTHER_IN: &str =
+    "inside a string or a heredoc a shell runs, further in than its first level";
+
+/// What [`placed_in`] found.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Placed {
+    /// A handoff in a `case` branch or a function body of the command itself.
+    Here(&'static str),
+    /// A handoff in a string or a heredoc a shell runs, past the first level.
+    FurtherIn,
+    /// A string handed on past [`crate::guardcaps::MAX_NESTING`] levels, not read.
+    TooDeep,
+}
+
+/// A handoff the line and first-level readings do not find (#1419, #1426): in a `case` branch
+/// or a function body ([`consentspelling::in_a_branch_or_body_by`]), or in a string or heredoc
+/// a shell runs at any level up to the nesting cap, through the one walk the consent and
+/// operator-rule backstops read with ([`consentspelling::in_shell_strings_at_every_level_by`]).
+/// Past the cap it fails closed.
+fn placed_in(read: &Heredocs) -> Option<Placed> {
+    if let Some(((), place)) =
+        consentspelling::in_a_branch_or_body_by(&read.stripped, &|text: &str| {
+            runs_a_handoff(text).then_some(())
+        })
+    {
+        return Some(Placed::Here(place.said()));
+    }
+    match consentspelling::in_shell_strings_at_every_level_by(read, &|inner: &Heredocs| {
+        runs_a_handoff_at_its_level(inner).then_some(())
+    })? {
+        Nested::Found(()) => Some(Placed::FurtherIn),
+        Nested::TooDeep => Some(Placed::TooDeep),
+    }
+}
+
+/// Whether `text` holds a handoff, read with the two readers A7 reads a line with.
+fn runs_a_handoff(text: &str) -> bool {
+    is_handoff(&as_the_shell_reads(text)) || disguised_handoff(text)
+}
+
+/// Whether a text a shell is handed runs a handoff at its own level: on a line of it a reader
+/// does not take as data, in a `case` branch or a function body, or in a substitution it runs
+/// at any depth. A text whose substitutions reach past the walk's bounds is read as one that
+/// does (fails closed). **A reader's heredoc body in it is read as commands too**, as the
+/// first level's line reading reads one: the three backstops refuse it alike.
+fn runs_a_handoff_at_its_level(read: &Heredocs) -> bool {
+    if runs_a_handoff(&read.text)
+        || consentspelling::in_a_branch_or_body_by(&read.stripped, &|text: &str| {
+            runs_a_handoff(text).then_some(())
+        })
+        .is_some()
+    {
+        return true;
+    }
+    let inward = read.inward();
+    inward.too_big
+        || consentspelling::in_a_substitution_by(inward, &|segments: &[Vec<String>]| {
+            segments
+                .iter()
+                .any(|toks| {
+                    let (prog, _env, argv) = shellwrap::split_env(toks);
+                    runs_handoff(&prog, &argv)
+                })
+                .then_some(())
+        })
+        .is_some()
+}
+
+// ----------------------------------------------------------------------------------------
 // the verdict
 // ----------------------------------------------------------------------------------------
 
@@ -577,6 +660,11 @@ impl Caller<'_> {
 ///    own segment, or a live substitution anywhere in the call
 ///    ([`livesub::live_substitution`], scoped to the WHOLE call like A5 and A6, for their
 ///    reason).
+/// 5. Once none of those has anything to refuse ([`placed_in`], #1419, #1426): a handoff in a
+///    `case` branch or a function body (`handoff-spelling`, saying where it sits), or in a
+///    string or heredoc a shell runs further in than its first level (`handoff-shell-string`),
+///    read through the walk the consent and operator-rule backstops share; and a string handed
+///    on past the nesting cap, unread (`too-big-to-check`). A helper is told it is one first.
 ///
 /// **What it no longer refuses** (#1444, where a handoff became a dispatch and its consent the
 /// dispatch grant). Both stood in for the harness's own permission prompt, which consents to
@@ -596,11 +684,50 @@ impl Caller<'_> {
 /// — taken from the tokenizer that already found this `<<`. A search of the raw line for it
 /// would be misled by a quoted `"<<"` earlier on the line.
 pub fn handoff_refusal(cmd: &str, caller: Caller<'_>) -> Option<(&'static str, String)> {
-    let found = handoff_line(cmd);
-    let in_a_string = shell_string_handoff(cmd);
+    handoff_refusal_of(&Heredocs::of(cmd), caller)
+}
+
+/// [`handoff_refusal`] of a command already read, for a caller that reads it once for every
+/// backstop ([`crate::toolgate`], #1426).
+///
+/// **Then further in** ([`placed_in`]): once the readers above have nothing to refuse, a
+/// handoff in a `case` branch, a function body, or a string or heredoc a shell runs past its
+/// first level is refused too. It is asked last, so every answer the chain above gives is the
+/// one it gave; it only adds refusals.
+pub(crate) fn handoff_refusal_of(
+    read: &Heredocs,
+    caller: Caller<'_>,
+) -> Option<(&'static str, String)> {
+    let found = handoff_line_in(&read.rows);
+    let in_a_string = shell_string_handoff_in(&read.stripped);
+    let placed = || {
+        placed_in(read).map(|refusal| match refusal {
+            Placed::Here(where_) => (REASON_SPELLING, handoff_placed(where_)),
+            Placed::FurtherIn => (REASON_SHELL_STRING, handoff_placed(FURTHER_IN)),
+            Placed::TooDeep => (
+                crate::guardcaps::REASON,
+                crate::guardcaps::too_deep_refusal(),
+            ),
+        })
+    };
     if found.is_none() && !in_a_string {
-        return None;
+        let placed = placed()?;
+        if caller.from_a_subagent() {
+            return Some((REASON_SUBAGENT, HANDOFF_SUBAGENT.to_string()));
+        }
+        return Some(placed);
     }
+    judged(&read.text, caller, found, in_a_string).or_else(placed)
+}
+
+/// [`handoff_refusal_of`] for a call where [`handoff_line`] or [`shell_string_handoff`] found
+/// a handoff: the chain, in its order.
+fn judged(
+    cmd: &str,
+    caller: Caller<'_>,
+    found: Option<(String, bool)>,
+    in_a_string: bool,
+) -> Option<(&'static str, String)> {
     if caller.from_a_subagent() {
         return Some((REASON_SUBAGENT, HANDOFF_SUBAGENT.to_string()));
     }
@@ -983,6 +1110,60 @@ mod tests {
         assert!(said.contains("a file (<)"), "{said}");
         // Quoted, it is prose.
         assert_eq!(refusal("charter handoff report 'done <(x)'"), None);
+    }
+
+    /// A handoff in a branch, a body, or a string a shell hands on past the first level is
+    /// refused (#1419, #1426), and a helper is told it is one first.
+    #[test]
+    fn a_handoff_in_a_branch_a_body_or_a_string_further_in_is_refused() {
+        for cmd in [
+            "case x in x) charter handoff beta <<'B'\nx\nB\n;; esac",
+            "case x in y) :;; x) charter handoff beta <<'B'\nx\nB\n;; esac",
+            "f(){ charter handoff beta <<'B'\nx\nB\n}; f",
+            "function f { charter handoff beta; }; f",
+        ] {
+            assert!(refusal(cmd).is_some(), "{cmd:?} was let through");
+        }
+        for cmd in [
+            "bash -c \"bash -c 'charter handoff beta'\"",
+            "sh -c \"eval 'purlis handoff beta'\"",
+            "bash <<'EOF'\nbash -c \"bash -c 'charter handoff beta'\"\nEOF",
+            "eval \"bash -c 'f(){ charter handoff beta; }; f'\"",
+            "bash -c \"echo \\\"\\$(bash -c 'charter handoff beta')\\\"\"",
+        ] {
+            let (r, said) = refusal(cmd).unwrap_or_else(|| panic!("{cmd:?} was let through"));
+            assert_eq!(r, REASON_SHELL_STRING, "{cmd:?}");
+            assert!(said.contains(FURTHER_IN), "{cmd:?}: {said}");
+        }
+        let helper = Caller {
+            agent_id: Some("a1"),
+            ..attended()
+        };
+        assert_eq!(
+            handoff_refusal("bash -c \"bash -c 'charter handoff beta'\"", helper).map(|r| r.0),
+            Some(REASON_SUBAGENT)
+        );
+        // A mention at any level is not one.
+        for cmd in [
+            "bash -c \"bash -c 'echo charter handoff beta'\"",
+            "f(){ echo charter handoff beta; }; f",
+            "case x in x) echo charter handoff beta;; esac",
+        ] {
+            assert_eq!(refusal(cmd), None, "{cmd:?}");
+        }
+    }
+
+    /// A script a reader writes to a file inside a string a shell runs is read as commands at
+    /// every level, as the first level always read it, so the three backstops agree on it in
+    /// the refusing direction (#1426).
+    #[test]
+    fn a_readers_heredoc_inside_a_string_is_refused_at_every_level() {
+        for cmd in [
+            "bash -c \"cat > s.sh <<'E'\ncharter handoff beta\nE\"",
+            "bash -c \"bash -c \\\"cat > s.sh <<'E'\ncharter handoff beta\nE\\\"\"",
+        ] {
+            assert!(refusal(cmd).is_some(), "{cmd:?} was let through");
+        }
     }
 
     #[test]
