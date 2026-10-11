@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791713095637,
+  "lastUpdate": 1791715383555,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7392,6 +7392,48 @@ window.BENCHMARK_DATA = {
             "value": 104.9075325,
             "unit": "ms",
             "extra": "median of 5 runs: 103.500, 104.384, 104.908, 105.715, 106.765 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "b49362b5e3a7420db9f758cdb2cc319cd9ce38e1",
+          "message": "SandboxBlocks.window.test: wait for every refused host before reading them\n\nCI once found the Notice drawn before its third host's event had landed (`c.example.com:443`\nnot found). The hosts are now awaited, each of its copies a `code`.\n\nRefs #1738\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T14:33:08+04:00",
+          "tree_id": "8c656823afe76629db501f17a5599a1469405327",
+          "url": "https://github.com/purlis/purlis/commit/b49362b5e3a7420db9f758cdb2cc319cd9ce38e1"
+        },
+        "date": 1791715382946,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5360765,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.514, 0.532, 0.536, 0.557, 0.565 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.046534,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.411, 16.543, 17.047, 17.066, 17.212 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.70142000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 104.141, 104.213, 104.701, 105.279, 106.077 ms"
           }
         ]
       }
