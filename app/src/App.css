@@ -2581,6 +2581,8 @@ button.show-more:focus-visible {
   font-weight: 700;
   line-height: 1rem;
   font-variant-numeric: tabular-nums;
+  /* Repos' count is two numbers (#1739): one line, never wrapped under the icon. */
+  white-space: nowrap;
   text-align: center;
 }
 

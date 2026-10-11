@@ -5,7 +5,7 @@ import { userEvent } from "@testing-library/user-event";
 import { clearMocks, mockIPC } from "@tauri-apps/api/mocks";
 import App from "./App";
 import { forgetThisLaunch } from "./regions";
-import { showTheExplorer } from "./test-strips";
+import { showTheExplorer, showTheRepos } from "./test-strips";
 
 /**
  * **"Start a chat here" from a file's own tab, against the whole window** (#1151, lane KA's
@@ -111,11 +111,13 @@ afterEach(() => {
 const starts = (asked: Asked[]) =>
   asked.filter((one) => one.cmd === "start_chat_here").map((one) => one.args);
 
-/** Picks the branch in the Explorer and opens `README.md` in a tab of its own, as a press on its
- *  row does; answers its "Start a chat here". */
+/** Picks the branch in the Repos view (in the Panel since #1737) and opens `README.md` from
+ *  Explorer's Files in a tab of its own, as a press on its row does; answers its "Start a chat
+ *  here". */
 async function startFromThePreview() {
-  const explorer = await showTheExplorer();
-  await userEvent.click(await within(explorer).findByRole("treeitem", { name: /^one in svc/ }));
+  await showTheExplorer();
+  const repos = await showTheRepos();
+  await userEvent.click(await within(repos).findByRole("treeitem", { name: /^one in svc/ }));
   const tree = await screen.findByRole("tree", { name: "Files of one in svc" });
   await userEvent.click(await within(tree).findByRole("treeitem", { name: /^README\.md/ }));
   await userEvent.click(
