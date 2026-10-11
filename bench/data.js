@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791707070626,
+  "lastUpdate": 1791709086508,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7308,6 +7308,48 @@ window.BENCHMARK_DATA = {
             "value": 104.4999285,
             "unit": "ms",
             "extra": "median of 5 runs: 103.050, 104.117, 104.500, 105.358, 105.512 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "434b295ce2a9bfa6b1d0aecb9c1398241258ce79",
+          "message": "Stop a chat's added token counts at their largest rather than wrap\n\nThe spend file adds each conversation's figure (#1457). Each count is\nthe harness's own number, so two large ones could overflow u64: a wrap\nin release, a panic in debug. The counts now saturate; a cost past the\nlargest float is not finite, which `spent` already reads as no figure.\n\nTrain 65 review fix. Also reflows one doc comment in filewatch.rs and\ndrops a stray space in branchwatch.rs.\n\nRefs #1457 #1745\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T12:55:53+04:00",
+          "tree_id": "d2f790d1abfd728032f1657dc5b996321d48f0a7",
+          "url": "https://github.com/purlis/purlis/commit/434b295ce2a9bfa6b1d0aecb9c1398241258ce79"
+        },
+        "date": 1791709085724,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.4571745,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.448, 0.455, 0.457, 0.458, 0.459 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.311694000000003,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.196, 16.221, 16.312, 16.565, 16.900 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.008883,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.792, 100.999, 101.009, 101.194, 102.838 ms"
           }
         ]
       }
