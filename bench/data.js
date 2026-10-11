@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791756183701,
+  "lastUpdate": 1791758432443,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7980,6 +7980,48 @@ window.BENCHMARK_DATA = {
             "value": 105.315945,
             "unit": "ms",
             "extra": "median of 5 runs: 102.017, 105.068, 105.316, 105.768, 105.778 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "95ab8e262d566389c7b93889ab740dd999107d38",
+          "message": "A task owed one more report may send notes and questions until it\n\nA task whose report came out blocked, or that the person took up again\nafter its report (Owed::Again, #1768), was refused progress notes and\nquestions to its asking chat as one that had reported for good. Now it\ntalks with that chat as a task that still owes its report does, until its\none more report: same per-pair limit, Activity lines and delivery, and its\nquestion can be answered by that chat or the person. Not once its stop is\nrecorded, as its report is not. Closes #1786.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T02:20:43+04:00",
+          "tree_id": "2294f5466762e95a2da825f58e1c8d7392cc2ec9",
+          "url": "https://github.com/purlis/purlis/commit/95ab8e262d566389c7b93889ab740dd999107d38"
+        },
+        "date": 1791758431219,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.38692950000000004,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.378, 0.384, 0.387, 0.389, 0.393 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.6266525,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.499, 16.553, 16.627, 16.657, 16.659 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.68435199999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.356, 101.244, 101.684, 102.051, 102.062 ms"
           }
         ]
       }
