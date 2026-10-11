@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791715383555,
+  "lastUpdate": 1791716722487,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -7434,6 +7434,48 @@ window.BENCHMARK_DATA = {
             "value": 104.70142000000001,
             "unit": "ms",
             "extra": "median of 5 runs: 104.141, 104.213, 104.701, 105.279, 106.077 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "471271fcae6d7ff2b6909832bb35314e8545d3dc",
+          "message": "e2e: drop train 62's leftover diagnostics; focus the left handle from the page\n\nTrain 62 left CI diagnostics in place while it chased the Linux cascade:\na recorder of every press on the window in regions.e2e, and failure\nmessages that dump the dialogs and picker state in opening.ts, vaults and\nworkspace-explorer. The cascade is fixed, so the specs go back to their\nplain waits and messages.\n\nThe width spec still clicked the left sidebar's handle, which is 0px\nacross in the Linux WebView, so the click could land beside it. It now\nfocuses the handle from the page, as the Panel's handles do.\n\nRefs #1737, #1738\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-11T15:02:23+04:00",
+          "tree_id": "30bc735161fb04b0ddc4b34df880e08761fa73d9",
+          "url": "https://github.com/purlis/purlis/commit/471271fcae6d7ff2b6909832bb35314e8545d3dc"
+        },
+        "date": 1791716721629,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5104285,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.496, 0.510, 0.510, 0.513, 0.535 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.146556,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.930, 16.969, 17.147, 17.228, 17.439 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 103.7687405,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.381, 103.543, 103.769, 104.263, 104.975 ms"
           }
         ]
       }
