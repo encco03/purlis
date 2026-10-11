@@ -753,13 +753,13 @@ describe("open in your editor (RC-20)", () => {
     setYourEditor("variable");
     core(
       { "a.txt": { kind: "text", text: "hello\n" } },
-      "neither $VISUAL nor $EDITOR is set where purlis was started",
+      "neither `$VISUAL` nor `$EDITOR` is set where purlis was started",
     );
     render(<PieceFileTab plane={PLANE} cut={CUT} path="a.txt" />);
 
     await userEvent.click(await button());
 
-    expect(await screen.findByText(/neither \$VISUAL nor \$EDITOR is set/)).toBeInTheDocument();
+    expect(await screen.findByText(/neither `\$VISUAL` nor `\$EDITOR` is set/)).toBeInTheDocument();
   });
 
   it("is offered beside the file the tree shows, too", async () => {

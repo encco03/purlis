@@ -227,6 +227,10 @@ export const commands = {
 	 */
 	since: string | null,
 } | null, string>(__TAURI_INVOKE("project_read_only", { plane })),
+	/**  The project's harness declarations, read-only, for Settings (#1389). */
+	projectHarnessDeclarations: (plane: PlaneId) => typedError<ProjectHarnesses, string>(__TAURI_INVOKE("project_harness_declarations", { plane })),
+	/**  **Open file** on a harness declaration in Settings (#1389): the file in your editor. */
+	openHarnessDeclaration: (plane: PlaneId, file: string, editor: YourEditor) => typedError<null, string>(__TAURI_INVOKE("open_harness_declaration", { plane, file, editor })),
 	/**
 	 *  Moves projects into another window — **a new one when `to` is null** — and answers the
 	 *  label of the window they are now in.
@@ -3510,6 +3514,23 @@ export type Curations = {
 	cannot: string | null,
 };
 
+/**  One harness the project declares. */
+export type DeclaredHarness = {
+	/**  The word a profile's `kind` names. */
+	name: string,
+	/**  What the declaration calls it. */
+	title: string,
+	/**  The program it starts, a bare name found on `PATH`. */
+	program: string,
+	/**  `harnesses/<name>.toml`: what Open file is sent. */
+	file: string,
+	/**
+	 *  Whether it says how to start its ACP agent (level 3). Level 1, the terminal, it always
+	 *  has; level 2 is purlis's own and never a project's.
+	 */
+	acp: boolean,
+};
+
 /**  Why a grant the person accepted before waits for a yes again. */
 export type DispatchAgain = 
 /**  A commit of the project's history took it out, and the file holds it again. */
@@ -6545,6 +6566,15 @@ export type ProjectExtensions = {
 	local_left_out: string | null,
 };
 
+/**
+ *  **The project's harness declarations** (#1389): its own, in file-name order, and each
+ *  refused with its reason. The built-ins purlis ships are not the project's, so not listed.
+ */
+export type ProjectHarnesses = {
+	declared: DeclaredHarness[],
+	refused: RefusedHarness[],
+};
+
 /**  Both files. */
 export type ProjectSettings = {
 	shared: SettingsFile,
@@ -6766,6 +6796,14 @@ export type Refused = {
 	said: string,
 	/**  What the core refused on, in the order it said them. */
 	at_risk: AtRisk[],
+};
+
+/**  A declaration file purlis would not read. */
+export type RefusedHarness = {
+	/**  `harnesses/<file>`, or the folder itself: what Open file is sent, where it is a file. */
+	file: string,
+	/**  Why, in one sentence. */
+	reason: string,
 };
 
 /**  The operator's answer, as the window sends it. */

@@ -4,6 +4,7 @@ import {
   commands,
   type ExtensionTheme,
   type HarnessPlugins,
+  type ProjectHarnesses,
   type PlaneId,
   type ProjectExtensions,
   type ProjectTheme,
@@ -49,6 +50,7 @@ import { EXTENSIONS_LINK } from "./links";
 import { profilePage } from "./profileAddress";
 import { askIconThemes, iconsControl, iconsHeld, iconsNotes } from "./iconsPick";
 import { discoverRow } from "./discover";
+import { harnessDeclarationRows } from "./harnessDeclarations";
 import { settled } from "../PlaneEdits";
 import { NETWORK, networkGroup } from "./GrantedList";
 import { dispatchGroup } from "./dispatch";
@@ -103,6 +105,8 @@ export type ProjectRead = {
   plane?: PlaneId;
   /** Every icon theme an approved extension contributes (#1145): what Icons offers. */
   iconThemes?: readonly ExtensionTheme[];
+  /** The project's harness declarations (#1389), read-only, once the core has answered. */
+  declarations?: ProjectHarnesses;
 };
 
 /**
@@ -563,6 +567,10 @@ function declaredGroups(read: ProjectRead, reread?: () => void): SettingsGroup[]
         ]),
       ],
       ...(localOk ? { collection: profilesCollection(read.local, read.plane) } : {}),
+      // The project's own harnesses, each read-only with Open file (#1389).
+      ...(read.plane !== undefined
+        ? { after: harnessDeclarationRows(read.plane, read.declarations) }
+        : {}),
     },
     ...profilePages(read),
     {
@@ -729,6 +737,7 @@ type ProjectFiles = { shared: SettingsFile; local: SettingsFile };
 export function useProjectLevel(plane: PlaneId): ProjectLevel {
   const [extensions, setExtensions] = useState<ProjectExtensions>(NO_EXTENSIONS);
   const [harnesses, setHarnesses] = useState<HarnessPlugins[]>([]);
+  const [declarations, setDeclarations] = useState<ProjectHarnesses>();
   const [theme, setTheme] = useState<ProjectTheme>();
   const [iconThemes, setIconThemes] = useState<ExtensionTheme[]>();
   const [saving, setSaving] = useState<Saving>();
@@ -790,6 +799,12 @@ export function useProjectLevel(plane: PlaneId): ProjectLevel {
         if (newest()) setHarnesses(said.status === "ok" ? (said.data ?? []) : []);
       })
       .catch(() => newest() && setHarnesses([]));
+    void commands
+      .projectHarnessDeclarations(plane)
+      .then((said) => {
+        if (newest()) setDeclarations(said.status === "ok" ? (said.data ?? undefined) : undefined);
+      })
+      .catch(() => newest() && setDeclarations(undefined));
     void commands
       .projectSavingInForce(plane)
       .then((said) => {
@@ -1029,6 +1044,7 @@ export function useProjectLevel(plane: PlaneId): ProjectLevel {
       ...driver.now,
       extensions,
       harnesses,
+      declarations,
       theme,
       saving,
       sandbox,

@@ -47,6 +47,7 @@ mod gitbroker;
 mod goingaway;
 mod handoff;
 mod harness_plugins;
+mod harnessdecls;
 mod heard;
 mod hooks;
 mod host;
