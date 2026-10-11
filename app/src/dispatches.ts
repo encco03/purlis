@@ -239,10 +239,28 @@ export function nestedSaid(loss: WorktreeLoss): string | undefined {
     : `${loss.nested.length} of them are repositories of their own. Everything in them, their history too, goes with the folder:`;
 }
 
+/**
+ * The heading over **what git keeps for the folder alone** (#1472): a ref only it has, its own
+ * settings, a commit only its history of HEAD holds, all of which go with it. Nothing where it
+ * has none, or where the core did not say (a window older than the field); where git would
+ * not say, that it could not be read, which is never taken as none.
+ */
+export function ownSaid(loss: WorktreeLoss): string | undefined {
+  if (loss.own === undefined || (loss.own !== null && loss.own.length === 0)) return undefined;
+  return loss.own === null
+    ? "purlis could not read whether git keeps anything for this folder alone. Whatever it keeps goes with it."
+    : "What git keeps for this folder alone goes with it:";
+}
+
 /** Whether a discard would delete nothing: no uncommitted file, no ignored path of the task's,
- *  and no commit made on no branch. */
+ *  no commit made on no branch, and nothing git keeps for the folder alone. */
 export function losesNothing(loss: WorktreeLoss): boolean {
-  return loss.changes.length === 0 && loss.ignored.length === 0 && lostSaid(loss) === undefined;
+  return (
+    loss.changes.length === 0 &&
+    loss.ignored.length === 0 &&
+    lostSaid(loss) === undefined &&
+    ownSaid(loss) === undefined
+  );
 }
 
 /** The heading over a list of what goes with the folder: `2 uncommitted files would be lost:`. */

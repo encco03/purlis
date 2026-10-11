@@ -985,6 +985,12 @@ pub(crate) struct WorktreeLoss {
     /// Those commits, newest first, as `<short sha> <subject>` and at most eleven of them,
     /// **where they would be lost**: the folder is on no branch. Empty otherwise.
     pub lost: Vec<String>,
+    /// **What git keeps for this folder alone** (#1472), one line each: a ref only it has, its
+    /// own settings, a commit only its history of HEAD holds. All of it goes with the folder.
+    /// Empty where it has none; null where git would not say, which is never read as none.
+    #[serde(default)]
+    #[specta(optional)]
+    pub own: Option<Vec<String>>,
 }
 
 /// What a discard is told of a folder that is no longer there.
@@ -1155,6 +1161,9 @@ pub(crate) fn what_changed(seen: &WorktreeLoss, now: &WorktreeLoss) -> String {
             seen.unmerged
         ));
     }
+    if seen.own != now.own {
+        said.push("what git keeps for it alone has changed".to_owned());
+    }
     if seen.on != now.on {
         said.push(match &now.on {
             Some(on) => format!("it is on '{}' now", purlis_core::shown::short(on)),
@@ -1186,6 +1195,10 @@ fn loss_from(
     seal: String,
 ) -> Result<WorktreeLoss, String> {
     let changes = risk.changes.ok_or_else(unread)?;
+    let own = risk
+        .own
+        .as_ref()
+        .map(purlis_core::worktree::standing::OwnGit::said);
     Ok(WorktreeLoss {
         task: record
             .task
@@ -1207,6 +1220,7 @@ fn loss_from(
         },
         on: risk.branch,
         seal,
+        own,
     })
 }
 
@@ -1722,7 +1736,42 @@ mod tests {
             seal: seal.to_owned(),
             unmerged: 0,
             lost: Vec::new(),
+            own: Some(Vec::new()),
         }
+    }
+
+    /// #1472: git state only the folder held, gained or let go of since the question, refuses
+    /// the Discard and says so.
+    #[test]
+    fn a_change_in_what_git_keeps_for_the_folder_alone_is_named() {
+        let seen = a_loss(&[], "one");
+        let now = WorktreeLoss {
+            own: Some(vec![
+                "refs/bisect/bad, a ref only this folder has".to_owned(),
+            ]),
+            ..a_loss(&[], "one")
+        };
+        let said = what_changed(&seen, &now);
+        assert!(
+            said.contains("what git keeps for it alone has changed"),
+            "{said}"
+        );
+        assert!(said.contains("Nothing was removed"), "{said}");
+        // Unread now, where it was read as none: not the same answer either.
+        let unread = WorktreeLoss {
+            own: None,
+            ..a_loss(&[], "one")
+        };
+        assert!(what_changed(&seen, &unread).contains("what git keeps for it alone"));
+    }
+
+    /// The question a window that knows nothing of `own` hands back still reads, as unread.
+    #[test]
+    fn a_loss_handed_back_without_its_own_git_state_reads_as_unread() {
+        let mut sent = serde_json::to_value(a_loss(&[], "one")).expect("it serialises");
+        sent.as_object_mut().expect("an object").remove("own");
+        let read: WorktreeLoss = serde_json::from_value(sent).expect("it reads");
+        assert_eq!(read.own, None);
     }
 
     /// #1472: a Discard refused because the folder changed names what changed, so the person
