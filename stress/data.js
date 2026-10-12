@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791779280360,
+  "lastUpdate": 1791780723683,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -108,6 +108,42 @@ window.BENCHMARK_DATA = {
             "value": 189.1,
             "unit": "MB",
             "extra": "median of 6 samples: 208.4, 190.4, 188, 188.8, 189.5, 164.1 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "5b6d627387fc0b1b2379d219f703c6fd1f95ecac",
+          "message": "pane-notices.e2e.ts names no helper inside an execute\n\nOn macOS the run failed in `raise`: the spec's bundler wrapped the\npage-side helper in a `__name` call the page does not have, as\ngauge.e2e.ts and view-tabs.e2e.ts already note. Every helper the page\nruns is now held in a list rather than bound by name.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T08:27:26+04:00",
+          "tree_id": "6b72845cb65edaf956f98a8c1caf70d6c60b86e6",
+          "url": "https://github.com/purlis/purlis/commit/5b6d627387fc0b1b2379d219f703c6fd1f95ecac"
+        },
+        "date": 1791780722699,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 841,
+            "unit": "MB",
+            "extra": "median of 3 samples: 629, 841, 880 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 195.8,
+            "unit": "MB",
+            "extra": "median of 6 samples: 196.7, 196.1, 194.8, 195.5, 196.1, 107.4 MB"
           }
         ]
       }
