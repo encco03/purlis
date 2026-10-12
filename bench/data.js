@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791789169749,
+  "lastUpdate": 1791790223427,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8400,6 +8400,48 @@ window.BENCHMARK_DATA = {
             "value": 105.41402,
             "unit": "ms",
             "extra": "median of 5 runs: 104.218, 105.113, 105.414, 105.683, 106.062 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "40f2ac86b9471cfb153825eda867a96f8b0bbac3",
+          "message": "A Go tool's refused certificate check is read from a failed command\n\nA sandboxed chat's `glab api` failed with `x509: OSStatus -26276` and no\nNotice came up. A Go program refused the system's certificate check exits\nnon-zero, so its words reach the block hook only in PostToolUseFailure's\n`error`, which is read as standard output: a line counts only where it\nends as a refusal, and no ending matched the certificate check. The one\nexisting test fed the line as standard error of a command that succeeded,\na shape real Go CLIs never produce for this failure.\n\n`ends_as_a_refusal` now ends on `x509: OSStatus -26276`, so the existing\ncertificate-check block, and its Notice, comes up. A line that only\nquotes the words is still not a block. Nothing is granted.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T11:18:22+04:00",
+          "tree_id": "09d518c68fb95e77c39601dd4ab334be10717cdf",
+          "url": "https://github.com/purlis/purlis/commit/40f2ac86b9471cfb153825eda867a96f8b0bbac3"
+        },
+        "date": 1791790222440,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.4719875,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.472, 0.472, 0.472, 0.473, 0.483 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.3659525,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.279, 16.291, 16.366, 16.723, 16.869 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.3378015,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.220, 100.830, 101.338, 101.627, 102.410 ms"
           }
         ]
       }
