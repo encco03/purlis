@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791777218268,
+  "lastUpdate": 1791779318032,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8316,6 +8316,48 @@ window.BENCHMARK_DATA = {
             "value": 101.1544325,
             "unit": "ms",
             "extra": "median of 5 runs: 100.612, 100.685, 101.154, 101.456, 102.085 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "5b6d627387fc0b1b2379d219f703c6fd1f95ecac",
+          "message": "pane-notices.e2e.ts names no helper inside an execute\n\nOn macOS the run failed in `raise`: the spec's bundler wrapped the\npage-side helper in a `__name` call the page does not have, as\ngauge.e2e.ts and view-tabs.e2e.ts already note. Every helper the page\nruns is now held in a list rather than bound by name.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T08:27:26+04:00",
+          "tree_id": "6b72845cb65edaf956f98a8c1caf70d6c60b86e6",
+          "url": "https://github.com/purlis/purlis/commit/5b6d627387fc0b1b2379d219f703c6fd1f95ecac"
+        },
+        "date": 1791779317210,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5262455,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.504, 0.516, 0.526, 0.541, 0.561 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.9928505,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.350, 16.804, 16.993, 17.198, 17.271 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.2799195,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.631, 104.224, 104.280, 104.718, 105.378 ms"
           }
         ]
       }
