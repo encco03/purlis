@@ -46,6 +46,7 @@ mod findfiles;
 mod finished;
 mod firstrun;
 mod firsttask;
+mod getproject;
 mod gitbroker;
 mod goingaway;
 mod handoff;
@@ -4091,7 +4092,7 @@ mod tests {
 
     /// The window's commands that take a channel: `watch_session`, the one that streams a
     /// terminal to a pane.
-    const TAKES_A_CHANNEL: &[&str] = &["watch_session"];
+    const TAKES_A_CHANNEL: &[&str] = &["watch_session", "get_project"];
 }
 
 /// The bounded reader every automatic read of a branch goes through (FM-4, D-88h): this binary,
