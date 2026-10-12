@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791775564027,
+  "lastUpdate": 1791777218268,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8274,6 +8274,48 @@ window.BENCHMARK_DATA = {
             "value": 100.88948350000001,
             "unit": "ms",
             "extra": "median of 5 runs: 100.715, 100.724, 100.889, 101.632, 101.677 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "ec72f237b6328673b007eea6d61914caba0c9dd3",
+          "message": "A dev release builds nothing when its source carries another release.yml\n\nRelease run 38189104321 was started by ci at fc7131dd, which went green\njust after train 76 (37ec362e) merged. A workflow_run executes main's\nrelease.yml (37ec362e, with the new third-party notices check) but builds\nthe triggering commit (fc7131dd, from before the notices existed), so the\ncheck's grep found no app/dist/THIRD-PARTY-NOTICES and exited 2 on both\nplatforms. The notices themselves are fine: run 38190972158 built\n37ec362e under the same check and passed it.\n\nplan now checks out the release.yml it executes (github.workflow_sha,\nsparsely) beside the source, and a workflow_run whose two files differ\nskips its build with a notice; the newer commit's own ci starts the\nrelease that builds it. A new release-manifest test pins the notices'\npath across the generator, vite, tauri.release.conf.json and the check,\nand pins the skew skip.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T07:52:26+04:00",
+          "tree_id": "a87af27fbda4252470d20ba00bd58b6980450d25",
+          "url": "https://github.com/purlis/purlis/commit/ec72f237b6328673b007eea6d61914caba0c9dd3"
+        },
+        "date": 1791777217476,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.469519,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.443, 0.451, 0.470, 0.471, 0.486 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.2921165,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.143, 16.228, 16.292, 16.498, 17.018 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.1544325,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.612, 100.685, 101.154, 101.456, 102.085 ms"
           }
         ]
       }
