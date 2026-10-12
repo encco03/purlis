@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791770349961,
+  "lastUpdate": 1791775564027,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8232,6 +8232,48 @@ window.BENCHMARK_DATA = {
             "value": 102.4878465,
             "unit": "ms",
             "extra": "median of 5 runs: 101.726, 102.045, 102.488, 102.518, 103.094 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "30a7daebb0d2fe6c5c702af6cb2da734f97560fc",
+          "message": "Secret scan: a prefilter in front of the vendor and personal-data rules; linear-time tests compare sizes\n\nLane VA (#773) took the per-line rules from 9 vendor and 3 personal-data\npatterns to 63 and 12, each run over every line. On PR #1800\nmany_escaped_addresses_and_many_joined_lines_read_in_linear_time took 14.66 s\nand then 14.54 s against its 10 s bound.\n\nEach gitleaks rule now carries its keywords, as gitleaks' own rules do, and one\nRegexSet of them, read case-insensitively, says which vendor rules a line can\nhold; the personal-data rules are asked once as a RegexSet for the same. Only\nthose rules run. No rule or check changes: the_prefilters_never_hide_a_hit\nholds the prefiltered scan to the scan asking every rule over every planted\nvalue, near-miss, personal datum and two source files, upper-cased and with\nthe long s and Kelvin sign a (?i) rule folds.\n\nThe four linear-time tests the scan owns now time a size and four times it,\nthree rounds each, and fail when the larger takes 8 times as long or more\n(linear is 4, quadratic 16), under a 120 s ceiling. Turning escaped_leaks' seen\nset into a list fails two of them (8.9x and 13.1x).\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T07:24:04+04:00",
+          "tree_id": "acd4b8cba573a2468b89ffaddbbff39bc4b32615",
+          "url": "https://github.com/purlis/purlis/commit/30a7daebb0d2fe6c5c702af6cb2da734f97560fc"
+        },
+        "date": 1791775562680,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.27288650000000003,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.255, 0.272, 0.273, 0.281, 0.291 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.51869,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.401, 16.487, 16.519, 16.525, 16.580 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 100.88948350000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.715, 100.724, 100.889, 101.632, 101.677 ms"
           }
         ]
       }
