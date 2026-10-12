@@ -16,9 +16,17 @@ What is still to be measured needs a person with the phone: §1's second half, a
   defines that constant for macOS only. The spike vendors nix with the cfg narrowed to
   `target_os = "macos"` and patches it in. **purlis's own crates needed no change.** The fix
   belongs upstream in nix; until it lands, an iOS build carries the same one-line patch.
-- A Tauri 2 iOS app linked them and listed a host's chats over Wi-Fi through Noise XX: *pending
-  the phone run*. The same link works process-to-process on the Mac (the host's five tests and the
-  phone library's two).
+- A Tauri 2 iOS app linked them and listed a host's chats over Wi-Fi through Noise XX: **pass**
+  on a real iPhone (2026-10-12, free Apple ID sideload). Connect listed the three chats, the echo
+  chat returned what was typed, and both bursts drew to the byte (§2). The same link works
+  process-to-process on the Mac (the host's five tests and the phone library's two).
+- Two things the phone build needed that the plan did not say: Xcode runs its build-phase
+  scripts with a bare `PATH`, so the "Build Rust Code" phase must export Homebrew's and cargo's
+  bin directories first; and iOS did not always show the local-network prompt, so the app's
+  first fetch of the dev server failed until the permission was switched on by hand under
+  Settings → Privacy & Security → Local Network. Phase 1's app does not use a dev server, but
+  it does need the same permission for the gateway socket, and must say so on screen when
+  the connection is refused (`RESULTS.md` has the regeneration steps).
 - nix has a second iOS-broken use behind its `net` feature (`UtunIfname`, `sockopt.rs`, the same
   `SYSPROTO_CONTROL` under `apple_targets`). It is not enabled here; Phase 1 should not enable it.
 - A detail Phase 1 inherits: the protocol crate's client side on iOS still links `same-user`
@@ -29,15 +37,25 @@ What is still to be measured needs a person with the phone: §1's second half, a
 
 | Burst | Drawn | Seconds | Longest frame | Input stayed responsive |
 |---|---|---|---|---|
-| 2 MB (2,114,336 B) | pending | | | |
-| 13 MB (13,082,454 B) | pending | | | |
+| 2 MB (2,114,336 B) | 2,114,350 B (all of it, plus the 14-byte snapshot) | 3.11 | 36 ms | yes: 24 taps at 200 ms, worst 16 ms |
+| 13 MB (13,082,454 B) | 13,082,468 B (all of it) | 15.59 | 65 ms | yes: 85 taps at 200 ms, worst 16 ms |
 
-Desktop reference (spec L3): longest frame 42 / 52 ms, no freeze.
+Measured 2026-10-12 on the iPhone over Wi-Fi, WebGL renderer, the app's "Run all" button (the
+taps are synthetic: a timer every 200 ms measuring timer-to-next-frame, the same clock a pointer
+event uses). The app was neither killed nor blanked at 13 MB.
 
-**Decision for Phase 1:** pending the numbers. If the webview freezes or iOS kills the app, the
-spec's rule applies: the level-2 screen is timeline-only with "View on desktop".
+Desktop reference (spec L3): longest frame 42 / 52 ms, no freeze. The phone is at parity.
 
-Locking the phone mid-burst and reopening: pending.
+**Decision for Phase 1:** the chat-style view and the level-2 terminal mirror are both viable in
+WKWebView as the spec has them (spec §7 row 0 stays as written). Nothing here asks for the
+"timeline-only with View on desktop" fallback.
+
+Locking the phone mid-burst and reopening: **open**. One attempt on 2026-10-12: locked for 30 s
+mid-burst13, unlocked, reopened, and the first Connect listed no chats. The error text and the
+host's stderr were not captured and the run stopped there, so the cause is not known. The two
+candidates are iOS not having re-joined Wi-Fi within the spike's 10 s connect limit, or the
+link itself. Either way Phase 1's app retries the gateway on foreground with a visible state,
+and the plan carries a device test for suspend and resume (Review Focus 1).
 
 Two facts from building it, both about `session-protocol::view` as the gateway will meet it:
 
@@ -80,4 +98,9 @@ the spike's script had to answer it.
 
 1. Carry the nix cfg patch (or a nix release with it) in any iOS build until upstream fixes it.
 2. The gateway's view feeding must be paced by the PTY, never by a loop (§2's fact).
-3. Pending: the WKWebView verdict decides the level-2 screen's shape (spec §7 row 0).
+3. The level-2 terminal mirror stays as spec §7 row 0 has it: WKWebView drew 13 MB with no frame
+   over 65 ms on the phone, at parity with the desktop (§2).
+4. Suspend and resume is the open question (§2): the app retries the gateway on foreground with a
+   visible state, and the Phase 1 plan carries a device test for it, not only a process test.
+5. The phone's first run needs the local-network permission and must say so when a connection is
+   refused; iOS does not always prompt (§1).
