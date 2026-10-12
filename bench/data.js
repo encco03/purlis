@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791811313831,
+  "lastUpdate": 1791815218924,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8652,6 +8652,48 @@ window.BENCHMARK_DATA = {
             "value": 101.4140235,
             "unit": "ms",
             "extra": "median of 5 runs: 100.803, 100.836, 101.414, 101.456, 101.458 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "980d293bbe20b7757e2d0226372a722e37cb2cc6",
+          "message": "ci: the sccache notice carries its whole report\n\n#1829's run showed no sccache notice on either macOS part: the step filtered the report to five\nlines and printed nothing. It now carries the report's first 30 lines, escaped for a workflow\ncommand, or says sccache said nothing.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T17:48:40+04:00",
+          "tree_id": "0cb04a44cb64ff5743d1a90888a27ba438bc9faa",
+          "url": "https://github.com/purlis/purlis/commit/980d293bbe20b7757e2d0226372a722e37cb2cc6"
+        },
+        "date": 1791815217991,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.4703675,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.465, 0.467, 0.470, 0.484, 0.487 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.267460999999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.192, 16.197, 16.267, 16.572, 16.852 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.42695,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.890, 101.284, 101.427, 101.768, 102.237 ms"
           }
         ]
       }
