@@ -1,5 +1,5 @@
 # purlis
-
+Purlis is a git-native control plane for agentic development where engineers and coding agents work together, at scale.
 purlis as one cross-platform desktop app: run tons of harness sessions (Claude Code, Codex) in
 parallel, across workspaces and repos, and always know which one needs you.
 
@@ -213,6 +213,26 @@ The bundles carry the `purlis` binary beside the app's own executable, because t
 that one for hooks and deliberately does not look at `PATH`. It is staged as a Tauri sidecar by
 the workflow and declared in `app/src-tauri/tauri.release.conf.json`, which exists only so that
 a plain checkout — where the sidecar has not been built — still builds in CI.
+
+## Core Features
+
+- **Git-Native Control Plane for AI Agents:** Coordinate AI agents, manage up to 1,000 repositories, and run parallel tasks in isolated workspaces—all from a single Git-backed control plane.
+- **Git Is Your Source of Truth:** Keep your control-plane configuration and state in a single Git repository. No external database or hosted control-plane service required.
+- **One Control Plane, Up to 1,000 Repositories:** Manage up to 1,000 repositories from one environment. Coordinate work across projects without setting up a separate control plane for each repository.
+- **Parallel Execution, Full Visibility:** Run multiple tasks simultaneously, each in its own isolated workspace with access to only the repositories and branches it needs. Maintain visibility across every task and workspace.
+- **Agent Personas That Work Like Teammates:** Give each agent its own identity, permissions, secrets, and persistent memory. Personas can move across workspaces while retaining their context and access boundaries.
+- **Vault-Backed Secrets:** Store each persona’s secrets in a secure vault, without exposing secret values to the model.
+- **Sandboxed by Default:** Run every agent harness in a secure sandbox. Explicitly control which network connections are allowed and which are blocked.
+
+## Enterprise Outcomes
+
+Deliver measurable business value through secure, scalable, and efficient AI agent orchestration.
+
+- **Cost Optimization:** Reduce infrastructure costs, operational overhead, and engineering effort through centralized management and efficient resource utilization.
+- **Performance & Productivity:** Accelerate development cycles, increase engineering throughput, and enable parallel execution of complex workflows.
+- **Reliability & Operational Excellence:** Improve system stability, execution consistency, and operational visibility through isolated environments and centralized control.
+- **Enterprise-Wide Adoption:** Accelerate AI adoption across teams with standardized workflows, secure access controls, and scalable agent management.
+- **Return on Investment (ROI):** Maximize the business value of AI investments through lower operating costs, faster delivery, and measurable productivity gains.
 
 ## Community and support
 
