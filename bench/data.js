@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791846654914,
+  "lastUpdate": 1791848512903,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8946,6 +8946,48 @@ window.BENCHMARK_DATA = {
             "value": 103.8595265,
             "unit": "ms",
             "extra": "median of 5 runs: 103.514, 103.640, 103.860, 104.577, 105.157 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "25df81a66a564919e555651b2c81cd76ae66b954",
+          "message": "review(train 87): the cold start reports and does not gate, until #1876\n\nThe relative gate's first runs on this train held the same app code at\n0.98-1.03 in two jobs and 1.17-1.20 in two others, steadily across\nevery round. Nothing in the train runs at launch on Linux. Until the\ncause is found the cold start is evidence on pull requests too.\n\nRefs #1866, #1876\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T03:40:37+04:00",
+          "tree_id": "d54f484c4f78b65e6857b77fb365286fe3db66a1",
+          "url": "https://github.com/purlis/purlis/commit/25df81a66a564919e555651b2c81cd76ae66b954"
+        },
+        "date": 1791848511491,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.3869475,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.373, 0.383, 0.387, 0.393, 0.395 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.849494999999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.669, 16.692, 16.849, 16.886, 16.979 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 102.450125,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.921, 102.129, 102.450, 103.530, 103.682 ms"
           }
         ]
       }
