@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791779318032,
+  "lastUpdate": 1791789169749,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8358,6 +8358,48 @@ window.BENCHMARK_DATA = {
             "value": 104.2799195,
             "unit": "ms",
             "extra": "median of 5 runs: 102.631, 104.224, 104.280, 104.718, 105.378 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "c90766a7ea647d63dd648d35cc11ce5a7eaab628",
+          "message": "A launch's first event is redacted even while the log's rules are still building\n\nThe rules are built on a thread beside the launch now, so the first event\ncan be raised before they are ready. Every write already asks the rules\nthrough the same OnceLocks, so that event waits for them and is never\nwritten as it was said. A test proves it in a child of the test binary,\nwhose first event carries a token while the rules are still building: the\nfile and standard error hold the redaction line and never the token. A\nvariant that lets events through until the rules are ready fails it.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T11:10:44+04:00",
+          "tree_id": "1c46be1c4c77e4bd4b0aee2e015945c765026855",
+          "url": "https://github.com/purlis/purlis/commit/c90766a7ea647d63dd648d35cc11ce5a7eaab628"
+        },
+        "date": 1791789169006,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.522066,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.516, 0.522, 0.522, 0.533, 0.540 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.1595505,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.575, 17.135, 17.160, 17.403, 17.457 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.41402,
+            "unit": "ms",
+            "extra": "median of 5 runs: 104.218, 105.113, 105.414, 105.683, 106.062 ms"
           }
         ]
       }
