@@ -197,6 +197,14 @@ const NOT_NOTICES: Record<string, { count: number; why: string }> = {
       READING +
       ": the harnesses it could not look at and the branches it could not list",
   },
+  "GitMissing.tsx": {
+    count: 3,
+    why:
+      ACTION +
+      ". The git screen's own lines (#1813): Install's or the look's refusal, that Apple's " +
+      "installer is open, and the look in progress; its Install, Check again and Not now are " +
+      "the way out",
+  },
   "HarnessSetupTab.tsx": {
     count: 1,
     why: ACTION,
