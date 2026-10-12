@@ -52,7 +52,7 @@
 
 use std::path::Path;
 
-use crate::forge::{self, Caller, Forge, pr};
+use crate::forge::{self, Forge, pr};
 use crate::gitstate;
 use crate::planegit::{self, Claim, Stage, Trigger};
 use crate::planesave::{self, Mode};
@@ -574,7 +574,7 @@ fn commit_push(
         pr::MARKER
     );
     let opened = match repo_on_forge.backend().open_or_update(
-        &Caller::command(),
+        &trigger.caller(),
         &repo_on_forge.path,
         &remote_branch,
         &base,
@@ -614,7 +614,7 @@ fn commit_push(
     )));
     if mode == Mode::PrMerge {
         match repo_on_forge.backend().request_auto_merge(
-            &Caller::command(),
+            &trigger.caller(),
             &repo_on_forge.path,
             &opened,
             &head_sha,
