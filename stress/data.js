@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791833975869,
+  "lastUpdate": 1791841923484,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -502,6 +502,42 @@ window.BENCHMARK_DATA = {
             "value": 168.7,
             "unit": "MB",
             "extra": "median of 6 samples: 242.6, 186.7, 182.6, 154.1, 154.9, 128.2 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "09ea69d06b812bafabaec2e0433ac6082bc5a388",
+          "message": "review(train 84): the Inbox's Updates heading wraps its acts in a narrow sidebar\n\nThe diagnostic named it: `.inbox-updates-head` (\"Updates\", \"Mark all\nread\", \"Dismiss all\") ran 178px in 157px on macOS. DS-12 (#1844) drew the\ntwo acts as `.ui-button`, which keeps each label on one line, in a head\nthat never wrapped, so the line widened the Inbox. The head wraps now:\nheading and acts on one line where there is room, the acts under the\nheading where there is not.\n\nRefs #1844\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T01:03:39+04:00",
+          "tree_id": "70d5390ff39ef6e1ee7dac2931eb5a5d4688cfc2",
+          "url": "https://github.com/purlis/purlis/commit/09ea69d06b812bafabaec2e0433ac6082bc5a388"
+        },
+        "date": 1791841922678,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 875,
+            "unit": "MB",
+            "extra": "median of 3 samples: 724, 875, 1023 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 175.5,
+            "unit": "MB",
+            "extra": "median of 6 samples: 253.2, 193.8, 180.4, 170, 170.7, 133.1 MB"
           }
         ]
       }
