@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791833960774,
+  "lastUpdate": 1791833975869,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -934,6 +934,42 @@ window.BENCHMARK_DATA = {
             "value": 421.1,
             "unit": "MB",
             "extra": "median of 6 samples: 391.9, 411.4, 415, 427.3, 427.2, 517.7 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "5360f04bfe3a6bf6df3ad08685e3f4375dbf9fde",
+          "message": "review(train 83): the two CI reds on 1ee260e5\n\n- plane-format.md: the offered-mirrors record's tier reads as a tier,\n  then its reason after a dash, as the tier check reads every store.\n- hooks: the drain-while-running test expects the run its live call is\n  under first, as every live hook test does; the dedupe is unchanged.\n\nRefs #1583\nRefs #952\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T23:00:27+04:00",
+          "tree_id": "1f23403e10e21940adfb56cda4c7bc160f33468b",
+          "url": "https://github.com/purlis/purlis/commit/5360f04bfe3a6bf6df3ad08685e3f4375dbf9fde"
+        },
+        "date": 1791833974894,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1434.1,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1247.5, 1434.1, 1515.7 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 454.9,
+            "unit": "MB",
+            "extra": "median of 6 samples: 406.9, 429.9, 445.1, 464.6, 465.1, 545.4 MB"
           }
         ]
       }
