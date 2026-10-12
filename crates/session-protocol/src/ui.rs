@@ -305,6 +305,9 @@ pub const WINDOW_ONLY: &[&str] = &[
     // setting up this machine is the window's, never a link's.
     "onboarding_progress",
     "keep_onboarding_progress",
+    // The repos the person's forge accounts reach, listed as them (#1818): read from the window
+    // alone, as the accounts are.
+    "forge_repo_list",
 ];
 
 /// **The commands of who may dispatch to whom**, by name (spec #1483): every one is on

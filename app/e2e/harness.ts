@@ -85,6 +85,16 @@ export const GIT_ANSWER_VARIABLE = "PURLIS_E2E_GIT_ANSWER";
 export const THE_RUNS_GIT_ANSWER = join(THE_RUNS_TREE, "git-answer");
 
 /**
+ * The variable that names the recorded forge the `e2e` build's window signs in to and lists
+ * from (`RECORDED_FORGE` in `src-tauri/src/e2eforge.rs`; #1818). `recordedForge.test.ts` holds
+ * the two spellings together.
+ */
+export const RECORDED_FORGE_VARIABLE = "PURLIS_E2E_RECORDED_FORGE";
+
+/** The file every app this run launches answers its forge calls from (`recordedForge.ts`). */
+export const THE_RUNS_RECORDED_FORGE = join(THE_RUNS_TREE, "recorded-forge.json");
+
+/**
  * The environment a charter process this run starts is given: the plane it means, a machine
  * store of its own, and the fence.
  *
@@ -118,6 +128,9 @@ export function theRunsEnvironment(
     // Where a spec has the window's next look for git find none, read by the `e2e` build alone
     // (#1817, `gitAnswer.ts`).
     [GIT_ANSWER_VARIABLE]: THE_RUNS_GIT_ANSWER,
+    // The forge the window signs in to and lists from, read by the `e2e` build alone (#1818,
+    // `recordedForge.ts`): no run reaches a real one.
+    [RECORDED_FORGE_VARIABLE]: THE_RUNS_RECORDED_FORGE,
     ...extra,
   };
 }

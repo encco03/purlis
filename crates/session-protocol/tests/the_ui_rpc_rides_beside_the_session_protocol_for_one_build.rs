@@ -250,10 +250,11 @@ async fn answering_an_ask_is_never_served_on_the_link_even_to_the_window() {
     // And where the person is in the guided steps, read and kept (#1817).
     assert!(ui::WINDOW_ONLY.contains(&"onboarding_progress"));
     assert!(ui::WINDOW_ONLY.contains(&"keep_onboarding_progress"));
-    assert_eq!(
-        ui::WINDOW_ONLY.len(),
-        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 2
-    );
+    // And the repos those accounts reach, listed as them (#1818).
+    assert!(ui::WINDOW_ONLY.contains(&"forge_repo_list"));
+    let before_the_repo_list =
+        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 2;
+    assert_eq!(ui::WINDOW_ONLY.len(), before_the_repo_list + 1);
 }
 
 #[tokio::test]

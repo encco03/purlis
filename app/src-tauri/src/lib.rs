@@ -40,6 +40,8 @@ mod dispatchlimits;
 mod dispatchunattended;
 mod doctor;
 mod doing;
+#[cfg(feature = "e2e")]
+mod e2eforge;
 mod extensions;
 mod filewatch;
 mod findfiles;
@@ -83,6 +85,7 @@ mod portal;
 mod readonly;
 mod rebrief;
 mod references;
+mod repolist;
 mod restored;
 mod sandboxing;
 mod saving;

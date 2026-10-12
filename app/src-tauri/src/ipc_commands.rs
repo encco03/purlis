@@ -126,6 +126,7 @@ macro_rules! app_commands {
                 getproject::project_url_folder,
                 getproject::get_project,
                 getproject::cancel_get_project,
+                repolist::forge_repo_list,
                 firsttask::first_task_run,
                 firsttask::first_task_started,
                 open_session,
