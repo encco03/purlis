@@ -250,9 +250,12 @@ async fn answering_an_ask_is_never_served_on_the_link_even_to_the_window() {
     // And where the person is in the guided steps, read and kept (#1817).
     assert!(ui::WINDOW_ONLY.contains(&"onboarding_progress"));
     assert!(ui::WINDOW_ONLY.contains(&"keep_onboarding_progress"));
+    // And whether a folder is in a project, asked before offering to make it one (#1822).
+    assert!(ui::WINDOW_ONLY.contains(&"folder_is_a_project"));
+    // The last term counts #1817's two and #1822's one.
     assert_eq!(
         ui::WINDOW_ONLY.len(),
-        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 2
+        35 + 26 + 3 + 2 + 3 + 1 + 2 + 1 + 1 + 2 + 1 + 3 + 1 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 3
     );
 }
 

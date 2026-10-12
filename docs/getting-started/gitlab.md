@@ -70,7 +70,7 @@ picked last with **Choose a folder…**. The clone shows its progress, and **Can
 nothing behind. purlis then asks whether to trust the project before it opens it, as it does
 for every project. A private repo is cloned with your own git sign-in on this machine: your
 credential helper for HTTPS, or your SSH key. **Open a folder on this machine…** opens a
-project you already have.
+project you already have; a folder that is not a project yet is offered to be made one.
 
 ## Working with your GitLab repos
 
