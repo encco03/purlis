@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791766090364,
+  "lastUpdate": 1791767865945,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8148,6 +8148,48 @@ window.BENCHMARK_DATA = {
             "value": 101.125725,
             "unit": "ms",
             "extra": "median of 5 runs: 100.251, 101.114, 101.126, 101.551, 101.793 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "464109e4834371c932481180c431290eedb567ff",
+          "message": "Train 77 review: purlis mcp serves a read-only project; joined bash 3.2 lines are looked at, not walked\n\n- CI: the new read-only MCP test found the server refused whole on a\n  read-only project (FR-24), so it never served (#1051 l1 was not built).\n  `mcp` now runs there, after the one stderr line, and every tool that\n  writes is refused at its call, before it runs, whatever road it would\n  write by (a session record or a dispatch without the app included). The\n  read tools answer. plane-format.md lists it. The test now says which\n  call the server stopped at, and what it said, should it stop again.\n- CI: an ordinary 64 KiB commit message was refused as too deeply nested.\n  The lines of a body bash 3.2 runs whole were joined and walked as a\n  level of their own, so each paragraph nested once more. What the joined\n  lines hand on is now looked at, one level, never walked further in. The\n  bash 3.2 handoff test still refuses; the 4,993-command differential\n  still shows 0 refuses-less and 0 everyday changes.\n\nRefs #1089 #1051 #1426\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T04:45:08+04:00",
+          "tree_id": "a782013da554b47dfdd9c396af04d340ec935bb3",
+          "url": "https://github.com/purlis/purlis/commit/464109e4834371c932481180c431290eedb567ff"
+        },
+        "date": 1791767865165,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.45316599999999996,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.440, 0.440, 0.453, 0.453, 0.458 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.479114000000003,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.384, 16.394, 16.479, 16.511, 16.562 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 102.3446225,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.852, 102.183, 102.345, 102.437, 103.415 ms"
           }
         ]
       }
