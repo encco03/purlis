@@ -286,13 +286,22 @@ pub(super) fn knows_a_pr(root: &Path) -> bool {
 
 /// Push the plane's HEAD to the save branch and open or update its pull request — the PR
 /// modes' half of a save, once the commit is made. A push record it could not write is said.
-pub(super) fn push(root: &Path, plane: &Plane, sign: bool, say: Sink) -> PushResult {
-    let res = push_unsaid(root, plane, sign, say);
+///
+/// `caller` is who the forge is asked as: the person in the window for the save button, whose
+/// purlis sign-in then opens the pull request (#1816).
+pub(super) fn push(
+    root: &Path,
+    plane: &Plane,
+    sign: bool,
+    caller: &Caller,
+    say: Sink,
+) -> PushResult {
+    let res = push_unsaid(root, plane, sign, caller, say);
     super::said_if_unrecorded(res, say)
 }
 
 /// [`push`], before what it could not record is said.
-fn push_unsaid(root: &Path, plane: &Plane, sign: bool, say: Sink) -> PushResult {
+fn push_unsaid(root: &Path, plane: &Plane, sign: bool, caller: &Caller, say: Sink) -> PushResult {
     let mode = plane.mode.value.unwrap_or(Mode::Pr);
     let refused = |why: String, say: Sink| {
         say(Say::Warn(format!("Not pushed: {why}.")));
@@ -330,7 +339,15 @@ fn push_unsaid(root: &Path, plane: &Plane, sign: bool, say: Sink) -> PushResult 
     let noun = kind.request_noun();
 
     let head = resolve(root, "HEAD").unwrap_or_default();
-    let settled = settle(root, plane, &target, sign, Some((&https, &helper)), say);
+    let settled = settle(
+        root,
+        plane,
+        &target,
+        sign,
+        Some((&https, &helper)),
+        caller,
+        say,
+    );
     let head = match settled {
         Settled::Blocked(res) => return res,
         Settled::Unknown(why) => {
@@ -412,14 +429,10 @@ fn push_unsaid(root: &Path, plane: &Plane, sign: bool, say: Sink) -> PushResult 
     )));
 
     let (title, body) = describe(root, &target, &save, kind);
-    let pr::Opened { pr: opened, ours } = match repo.backend().open_or_update(
-        &Caller::command(),
-        &repo.path,
-        &save,
-        &target,
-        &title,
-        &body,
-    ) {
+    let pr::Opened { pr: opened, ours } = match repo
+        .backend()
+        .open_or_update(caller, &repo.path, &save, &target, &title, &body)
+    {
         Ok(opened) => opened,
         Err(why) => {
             say(Say::Warn(format!(
@@ -459,7 +472,7 @@ fn push_unsaid(root: &Path, plane: &Plane, sign: bool, say: Sink) -> PushResult 
     } else if mode == Mode::PrMerge {
         match repo
             .backend()
-            .request_auto_merge(&Caller::command(), &repo.path, &opened, &head)
+            .request_auto_merge(caller, &repo.path, &opened, &head)
         {
             Ok(AutoMerge::Queued) => say(Say::Info(
                 "  It merges by itself once its checks pass.".into(),
@@ -681,13 +694,15 @@ pub(super) enum Settled {
 ///
 /// `sign` is whether commits a rebase replays are signed, as the save's own commit is.
 /// `fetch` is the origin URL and credential helper to fetch the target branch with, for a
-/// caller that has not just fetched it; `None` when it has ([`super::fetch`]).
+/// caller that has not just fetched it; `None` when it has ([`super::fetch`]). `caller` is who
+/// the forge is asked as.
 pub(super) fn settle(
     root: &Path,
     plane: &Plane,
     target: &str,
     sign: bool,
     fetch: Option<(&str, &str)>,
+    caller: &Caller,
     say: Sink,
 ) -> Settled {
     let mut kept = Kept::read(root);
@@ -740,10 +755,7 @@ pub(super) fn settle(
             &head,
         ))
     };
-    let commit = match repo
-        .backend()
-        .state(&Caller::command(), &repo.path, &opened)
-    {
+    let commit = match repo.backend().state(caller, &repo.path, &opened) {
         Ok(State::Open) => return Settled::Open,
         Ok(State::Closed) => {
             return blocked(
