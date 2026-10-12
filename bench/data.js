@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791840694893,
+  "lastUpdate": 1791842606033,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8862,6 +8862,48 @@ window.BENCHMARK_DATA = {
             "value": 103.69965099999999,
             "unit": "ms",
             "extra": "median of 5 runs: 102.726, 103.582, 103.700, 103.909, 105.639 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "692bdf8ee446ed9d64e4f07a5dd51bc48184af85",
+          "message": "review(train 86): the vault-value store's fail-closed path is tested\n\nThe store's remember and holds become methods taking the key, so a test\ncan hand it none and see every later text said to hold a value. The\nprocess's store still makes its one random key; nothing else changes.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T01:56:10+04:00",
+          "tree_id": "ad1b893a1308332f1daa959b66956b75a71e9153",
+          "url": "https://github.com/purlis/purlis/commit/692bdf8ee446ed9d64e4f07a5dd51bc48184af85"
+        },
+        "date": 1791842605248,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.47165599999999996,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.460, 0.470, 0.472, 0.472, 0.476 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.4033645,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.144, 16.398, 16.403, 16.692, 16.701 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 102.03860350000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 99.881, 101.994, 102.039, 102.110, 102.146 ms"
           }
         ]
       }
