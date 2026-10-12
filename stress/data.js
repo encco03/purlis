@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791813984388,
+  "lastUpdate": 1791816332388,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -394,6 +394,42 @@ window.BENCHMARK_DATA = {
             "value": 174.2,
             "unit": "MB",
             "extra": "median of 6 samples: 202.8, 175.2, 178.8, 172.5, 173.2, 113.2 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "980d293bbe20b7757e2d0226372a722e37cb2cc6",
+          "message": "ci: the sccache notice carries its whole report\n\n#1829's run showed no sccache notice on either macOS part: the step filtered the report to five\nlines and printed nothing. It now carries the report's first 30 lines, escaped for a workflow\ncommand, or says sccache said nothing.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T17:48:40+04:00",
+          "tree_id": "0cb04a44cb64ff5743d1a90888a27ba438bc9faa",
+          "url": "https://github.com/purlis/purlis/commit/980d293bbe20b7757e2d0226372a722e37cb2cc6"
+        },
+        "date": 1791816331045,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 886,
+            "unit": "MB",
+            "extra": "median of 3 samples: 717, 886, 932 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 136.3,
+            "unit": "MB",
+            "extra": "median of 6 samples: 180.3, 175.3, 134.6, 136.1, 136.6, 121 MB"
           }
         ]
       }
