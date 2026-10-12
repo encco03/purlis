@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791848533317,
+  "lastUpdate": 1791848547531,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -1186,6 +1186,42 @@ window.BENCHMARK_DATA = {
             "value": 445.4,
             "unit": "MB",
             "extra": "median of 6 samples: 416.6, 432.3, 437.5, 453.3, 453.8, 539.3 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "9558d26fa212304f3a04e0adabe0757d818739b1",
+          "message": "The your-repos spec waits for the page to take the folder pick\n\nThe spec pressed a repo as soon as the folder pick's answer was read,\nbefore the page was known to hold the place picked; a repo picked then\nclones into ~/Projects, and the trust question comes for that folder\nwhile the spec's folder stays empty. It now waits until the page says\nthe place picked, and when the clone is not where it expects, it names\nthe folder the trust question asks about and what each candidate\nfolder holds.\n\nRefs #1858\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T03:08:34+04:00",
+          "tree_id": "77a563a37c559854bc5df9bb921e9f4cf4bdf901",
+          "url": "https://github.com/purlis/purlis/commit/9558d26fa212304f3a04e0adabe0757d818739b1"
+        },
+        "date": 1791848546735,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1407.2,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1336.4, 1407.2, 1594 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 428.7,
+            "unit": "MB",
+            "extra": "median of 6 samples: 404.9, 415.3, 417.4, 439.9, 440.4, 513.1 MB"
           }
         ]
       }
