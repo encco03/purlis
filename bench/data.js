@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791767865945,
+  "lastUpdate": 1791770349961,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8190,6 +8190,48 @@ window.BENCHMARK_DATA = {
             "value": 102.3446225,
             "unit": "ms",
             "extra": "median of 5 runs: 100.852, 102.183, 102.345, 102.437, 103.415 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "2605072b06de338895ece86f89f942eb10338081",
+          "message": "search-to-chat.e2e.ts knows its chat by the tab in front once it started\n\nOn Linux an earlier spec can leave a chat of the same name open, so the chat this spec started\nwas not a new name on the strip and was never found among those offered. The chat is now the\ntab in front once it is up; the after hook ends that one and closes the view tabs it opened.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T05:54:29+04:00",
+          "tree_id": "07a25b3d9c0e721698dd9bb661dedb291a5bf64e",
+          "url": "https://github.com/purlis/purlis/commit/2605072b06de338895ece86f89f942eb10338081"
+        },
+        "date": 1791770348908,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.39277249999999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.389, 0.389, 0.393, 0.420, 0.425 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.797070499999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.168, 16.170, 16.797, 16.800, 16.864 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 102.4878465,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.726, 102.045, 102.488, 102.518, 103.094 ms"
           }
         ]
       }
