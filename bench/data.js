@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791808486472,
+  "lastUpdate": 1791809421249,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8568,6 +8568,48 @@ window.BENCHMARK_DATA = {
             "value": 101.880342,
             "unit": "ms",
             "extra": "median of 5 runs: 100.545, 101.064, 101.880, 101.885, 102.062 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "01526f59a8bbf1ccb9ba4dfac0fad8fb01f27778",
+          "message": "ci: stress and standing restore a gating job's Rust cache and save none\n\nThe repository's Actions caches held 10.89 GB on 2026-10-12, against the 10 GB GitHub keeps\nbefore it drops the oldest, `main`'s gating caches among them (as on 2026-10-08). 3.5 GB was\nevidence-only jobs' own: stress on Linux and macOS (1.94 GB), standing (0.5), search-at-scale\n(0.83), bench (0.2). stress builds what the scenario jobs build and standing builds purlis-core's\ntests as `rust` does, so each now restores that job's cache (`shared-key`) and saves none; the\ncaches' keys share the environment hash per OS, so the restore hits. search-at-scale builds in\nrelease, which no gating job does, and keeps its own. About 2.4 GB freed.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T16:41:14+04:00",
+          "tree_id": "9d9967b5dba3b836542328f253f5183015c3f528",
+          "url": "https://github.com/purlis/purlis/commit/01526f59a8bbf1ccb9ba4dfac0fad8fb01f27778"
+        },
+        "date": 1791809419810,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5444009999999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.509, 0.537, 0.544, 0.550, 0.551 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.6823615,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.584, 16.630, 16.682, 16.916, 16.941 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.24194299999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.389, 104.922, 105.242, 105.252, 105.715 ms"
           }
         ]
       }
