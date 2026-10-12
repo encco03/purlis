@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791780737544,
+  "lastUpdate": 1791791130884,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -144,6 +144,42 @@ window.BENCHMARK_DATA = {
             "value": 195.8,
             "unit": "MB",
             "extra": "median of 6 samples: 196.7, 196.1, 194.8, 195.5, 196.1, 107.4 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "c90766a7ea647d63dd648d35cc11ce5a7eaab628",
+          "message": "A launch's first event is redacted even while the log's rules are still building\n\nThe rules are built on a thread beside the launch now, so the first event\ncan be raised before they are ready. Every write already asks the rules\nthrough the same OnceLocks, so that event waits for them and is never\nwritten as it was said. A test proves it in a child of the test binary,\nwhose first event carries a token while the rules are still building: the\nfile and standard error hold the redaction line and never the token. A\nvariant that lets events through until the rules are ready fails it.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T11:10:44+04:00",
+          "tree_id": "1c46be1c4c77e4bd4b0aee2e015945c765026855",
+          "url": "https://github.com/purlis/purlis/commit/c90766a7ea647d63dd648d35cc11ce5a7eaab628"
+        },
+        "date": 1791791129448,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 882,
+            "unit": "MB",
+            "extra": "median of 3 samples: 882, 882, 1078 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 172.9,
+            "unit": "MB",
+            "extra": "median of 6 samples: 190.9, 189.5, 192.6, 155.6, 156.3, 122.9 MB"
           }
         ]
       }
