@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791839254184,
+  "lastUpdate": 1791840694893,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8820,6 +8820,48 @@ window.BENCHMARK_DATA = {
             "value": 104.934834,
             "unit": "ms",
             "extra": "median of 5 runs: 102.360, 104.056, 104.935, 105.511, 107.071 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "f67fa029ab371cc9a104181d9226f40c07ccca19",
+          "message": "review(train 85): the your-repos spec waits for the trust question's own button\n\nThe wait took the Welcome's open-by-path \"Open project\" for the trust\nquestion's, so it ended before the clone landed and the .git check failed.\nThe button is now looked for inside the dialog, as get-project.e2e does.\n\nRefs #1858\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T01:20:18+04:00",
+          "tree_id": "b2a0f67212f57b1e4313f6ffbbfd055a6cba3a45",
+          "url": "https://github.com/purlis/purlis/commit/f67fa029ab371cc9a104181d9226f40c07ccca19"
+        },
+        "date": 1791840693702,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.517315,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.516, 0.517, 0.517, 0.520, 0.538 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.981992,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.402, 16.811, 16.982, 17.035, 17.128 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 103.69965099999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.726, 103.582, 103.700, 103.909, 105.639 ms"
           }
         ]
       }
