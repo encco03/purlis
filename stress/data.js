@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791800573135,
+  "lastUpdate": 1791800590876,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -468,6 +468,40 @@ window.BENCHMARK_DATA = {
             "value": 423.5,
             "unit": "MB",
             "extra": "median of 6 samples: 387.7, 411.4, 419.5, 427.4, 427.9, 503.6 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide",
+            "email": "aaron.yor@gmail.com"
+          },
+          "committer": {
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide",
+            "email": "aaron.yor@gmail.com"
+          },
+          "id": "40f2ac86b9471cfb153825eda867a96f8b0bbac3",
+          "message": "A Go tool's refused certificate check is read from a failed command\n\nA sandboxed chat's `glab api` failed with `x509: OSStatus -26276` and no\nNotice came up. A Go program refused the system's certificate check exits\nnon-zero, so its words reach the block hook only in PostToolUseFailure's\n`error`, which is read as standard output: a line counts only where it\nends as a refusal, and no ending matched the certificate check. The one\nexisting test fed the line as standard error of a command that succeeded,\na shape real Go CLIs never produce for this failure.\n\n`ends_as_a_refusal` now ends on `x509: OSStatus -26276`, so the existing\ncertificate-check block, and its Notice, comes up. A line that only\nquotes the words is still not a block. Nothing is granted.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T06:59:36Z",
+          "url": "https://github.com/purlis/purlis/commit/40f2ac86b9471cfb153825eda867a96f8b0bbac3"
+        },
+        "date": 1791800589397,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1544.3,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1337, 1557.8, 1544.3 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 422.8,
+            "unit": "MB",
+            "extra": "median of 6 samples: 394.7, 404.8, 410.8, 434.7, 435.1, 520.6 MB"
           }
         ]
       }
