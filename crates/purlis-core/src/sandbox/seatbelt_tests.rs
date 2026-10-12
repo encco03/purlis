@@ -98,3 +98,81 @@ fn the_refusal_says_what_happened_and_the_way_on_in_plain_words() {
     // Never an opt-out: the sandbox is not what is too long.
     assert!(!said.contains("without the sandbox"), "{said}");
 }
+
+/// #1408: a wrapped chat (opencode, Codex) connects to its hook socket and never writes the
+/// folder that holds it, wherever the app put it, so it can neither remove the socket nor put
+/// its own in the app's place. In the project's state folder that is the integrity class's;
+/// elsewhere (the app's fallback folder, inside a folder the chat may write) the profile holds
+/// it itself, as Claude Code's settings do.
+#[test]
+fn a_wrapped_chat_never_writes_the_hook_socket_s_folder_wherever_it_is() {
+    use crate::sandbox::tests::writes;
+    let dir = tempfile::tempdir().expect("a directory");
+    let root = dir.path().canonicalize().expect("resolved");
+    let cwd = root.join("workspaces/alpha/api");
+    let tmp = root.join("tmp");
+    let granted = root.join("granted");
+    for made in [&cwd, &tmp, &granted] {
+        std::fs::create_dir_all(made).expect("a folder");
+    }
+    let machine = crate::sandbox::Machine {
+        env: crate::secrets::Env::of(&[]),
+        home: Some(std::path::PathBuf::from("/home/op")),
+        os: crate::sandbox::Os::MacOs,
+    };
+    let denied = crate::sandbox::Denied::of(&root, &machine).paths;
+    let mut with_grant = super::Own::default();
+    super::granted(&mut with_grant, std::slice::from_ref(&granted)).expect("granted");
+    let state = crate::names::state(&root);
+    for (what, chat, own, socket) in [
+        (
+            "the state folder, a chat at the project root",
+            root.clone(),
+            super::Own::default(),
+            state.join("app/hooks.sock"),
+        ),
+        (
+            "a fallback folder inside a granted folder",
+            cwd.clone(),
+            with_grant,
+            granted.join("purlis-op-0123/hooks.sock"),
+        ),
+        (
+            "a folder inside the chat's own",
+            cwd.clone(),
+            super::Own::default(),
+            cwd.join(".sockets/hooks.sock"),
+        ),
+    ] {
+        let profile =
+            super::profile(&denied, &own, &chat, &tmp, &[4040], Some(&socket)).expect("a profile");
+        let folder = socket.parent().expect("a folder");
+        assert!(
+            writes(&profile, &chat.join("notes.txt")),
+            "{what}: {profile}"
+        );
+        for held in [
+            socket.clone(),
+            folder.to_path_buf(),
+            folder.join("hooks.sock.new"),
+        ] {
+            assert!(
+                !writes(&profile, &held),
+                "{what}: {} is writable:\n{profile}",
+                held.display()
+            );
+        }
+        let sockets: Vec<&str> = profile
+            .lines()
+            .filter(|line| line.contains("unix-socket"))
+            .collect();
+        assert_eq!(
+            sockets,
+            [format!(
+                "(allow network-outbound (remote unix-socket (path-literal \"{}\")))",
+                socket.display()
+            )],
+            "{what}"
+        );
+    }
+}
