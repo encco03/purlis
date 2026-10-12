@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791790223427,
+  "lastUpdate": 1791801065019,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8442,6 +8442,48 @@ window.BENCHMARK_DATA = {
             "value": 101.3378015,
             "unit": "ms",
             "extra": "median of 5 runs: 100.220, 100.830, 101.338, 101.627, 102.410 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "9cb49c8295431c94460eb8dc9d153226fde2f3e4",
+          "message": "Train 80 CI: every removed or added submodule pointer in the fixture names its own commit\n\nThe dropped and the added pointer named one commit too, which both git and gitoxide then read\nas a rename. The added pointer now names a third commit.\n\nRefs #704\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T14:29:29+04:00",
+          "tree_id": "3825fa91d4b639a3eda5e78d007871f30215ffca",
+          "url": "https://github.com/purlis/purlis/commit/9cb49c8295431c94460eb8dc9d153226fde2f3e4"
+        },
+        "date": 1791801063951,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.4939875,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.468, 0.490, 0.494, 0.498, 0.508 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.826183999999998,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.337, 16.663, 16.826, 17.025, 17.070 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.3360015,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.535, 102.839, 105.336, 105.572, 106.990 ms"
           }
         ]
       }
