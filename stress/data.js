@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791816349440,
+  "lastUpdate": 1791820256405,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -430,6 +430,42 @@ window.BENCHMARK_DATA = {
             "value": 136.3,
             "unit": "MB",
             "extra": "median of 6 samples: 180.3, 175.3, 134.6, 136.1, 136.6, 121 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "03c808c6525c8553d04557776ef4ee90947885ee",
+          "message": "Train 82 CI: the publish test reads its stand-in remote with plain git, and your-repos waits for its clone\n\n- publishproject's hands test read the bare repository standing in for\n  the forge through the runner, which opens a bare repository only\n  where it is named; it reads it with plain git and --git-dir, as\n  createproject's does.\n- your-repos.e2e.ts waits for the picked project's clone to land, then\n  for the trust question's own Open project, rather than any dialog.\n\nRefs #1820, #1818\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T19:16:28+04:00",
+          "tree_id": "69ea56cfc91ff29b87697445d7cd65773778fe1e",
+          "url": "https://github.com/purlis/purlis/commit/03c808c6525c8553d04557776ef4ee90947885ee"
+        },
+        "date": 1791820255297,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 519,
+            "unit": "MB",
+            "extra": "median of 3 samples: 432, 519, 584 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 279.3,
+            "unit": "MB",
+            "extra": "median of 6 samples: 278.4, 277.6, 278.8, 279.7, 280.6, 369 MB"
           }
         ]
       }
