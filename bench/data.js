@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791764171555,
+  "lastUpdate": 1791766090364,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8106,6 +8106,48 @@ window.BENCHMARK_DATA = {
             "value": 103.8854715,
             "unit": "ms",
             "extra": "median of 5 runs: 103.417, 103.781, 103.885, 104.180, 106.438 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "37ec362e67dd2ad8804dcbbeff9b6d324285915d",
+          "message": "Old-name guard: NewProject spells no old name now\n\nUG's help names purlis.toml, so its one allowed `charter.toml` is gone\nand the guard asks for the entry to go too (shrink only).\n\nRefs #1719\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T04:23:25+04:00",
+          "tree_id": "295662b18a6717a214ff31a5f3d820e2e160e1ee",
+          "url": "https://github.com/purlis/purlis/commit/37ec362e67dd2ad8804dcbbeff9b6d324285915d"
+        },
+        "date": 1791766088131,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.275725,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.264, 0.273, 0.276, 0.277, 0.280 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.5468765,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.443, 16.465, 16.547, 16.552, 16.596 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.125725,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.251, 101.114, 101.126, 101.551, 101.793 ms"
           }
         ]
       }
