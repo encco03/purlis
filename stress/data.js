@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791813967860,
+  "lastUpdate": 1791813984388,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -754,6 +754,42 @@ window.BENCHMARK_DATA = {
             "value": 425.6,
             "unit": "MB",
             "extra": "median of 6 samples: 395.8, 414.6, 421, 430.2, 430.7, 533.4 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "01526f59a8bbf1ccb9ba4dfac0fad8fb01f27778",
+          "message": "ci: stress and standing restore a gating job's Rust cache and save none\n\nThe repository's Actions caches held 10.89 GB on 2026-10-12, against the 10 GB GitHub keeps\nbefore it drops the oldest, `main`'s gating caches among them (as on 2026-10-08). 3.5 GB was\nevidence-only jobs' own: stress on Linux and macOS (1.94 GB), standing (0.5), search-at-scale\n(0.83), bench (0.2). stress builds what the scenario jobs build and standing builds purlis-core's\ntests as `rust` does, so each now restores that job's cache (`shared-key`) and saves none; the\ncaches' keys share the environment hash per OS, so the restore hits. search-at-scale builds in\nrelease, which no gating job does, and keeps its own. About 2.4 GB freed.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T16:41:14+04:00",
+          "tree_id": "9d9967b5dba3b836542328f253f5183015c3f528",
+          "url": "https://github.com/purlis/purlis/commit/01526f59a8bbf1ccb9ba4dfac0fad8fb01f27778"
+        },
+        "date": 1791813983583,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1499.7,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1286.7, 1499.7, 1622.2 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 429,
+            "unit": "MB",
+            "extra": "median of 6 samples: 389.4, 418.5, 424, 434, 433.9, 504.8 MB"
           }
         ]
       }
