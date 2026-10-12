@@ -334,7 +334,7 @@ fn a_repo_the_forge_will_not_delete_is_named_with_where_to_delete_it() {
             refused.sentence
         );
         assert_eq!(
-            refused.kept.as_ref().map(MadeRepo::path),
+            refused.kept.as_deref().map(MadeRepo::path),
             Some("acme/garden"),
             "{kind:?}: the repo the forge would not delete is handed back for a Retry"
         );
@@ -357,7 +357,7 @@ fn a_retry_pushes_into_the_repo_an_earlier_run_kept_and_makes_no_other() {
             &folder,
             None,
         );
-        let kept = first.unwrap_err().kept.expect("the repo is kept");
+        let kept = *first.unwrap_err().kept.expect("the repo is kept");
 
         let (backend, recorded) = over(kind, "owners_only");
         let hands = Fake::default();

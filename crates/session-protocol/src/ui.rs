@@ -312,6 +312,9 @@ pub const WINDOW_ONLY: &[&str] = &[
     "forge_owners",
     "new_project_folder",
     "cancel_create_project",
+    // Whether a project lives only on this machine (#1820): the window's line on the project's
+    // tab and in its settings, beside its Publish (which takes a channel), which no link needs.
+    "project_lives_here",
 ];
 
 /// **The commands of who may dispatch to whom**, by name (spec #1483): every one is on
