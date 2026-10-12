@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791801065019,
+  "lastUpdate": 1791804915682,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8484,6 +8484,48 @@ window.BENCHMARK_DATA = {
             "value": 105.3360015,
             "unit": "ms",
             "extra": "median of 5 runs: 101.535, 102.839, 105.336, 105.572, 106.990 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "2e24d553b8377c380b90bf587d2f22c053b48a95",
+          "message": "A fenced build's stand-in config home is its process's own\n\nA test process of the app's suite kept this machine's sandbox record in one\nfolder of the temporary directory that every test process shared, so one\ntest's folders could refuse another's write. It is per user and process now;\na run that keeps its store across launches names one inside its fence.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T15:24:07+04:00",
+          "tree_id": "f6d38a79fd42190114e329549b586e5148911e5d",
+          "url": "https://github.com/purlis/purlis/commit/2e24d553b8377c380b90bf587d2f22c053b48a95"
+        },
+        "date": 1791804914689,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.4692305,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.443, 0.469, 0.469, 0.472, 0.472 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.3787115,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.264, 16.326, 16.379, 16.399, 16.410 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.341888,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.518, 101.223, 101.342, 101.734, 102.173 ms"
           }
         ]
       }
