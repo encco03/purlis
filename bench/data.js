@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791809421249,
+  "lastUpdate": 1791811313831,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8610,6 +8610,48 @@ window.BENCHMARK_DATA = {
             "value": 105.24194299999999,
             "unit": "ms",
             "extra": "median of 5 runs: 103.389, 104.922, 105.242, 105.252, 105.715 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "66b716207ad81a926dffaf500adbc6c129ea2b49",
+          "message": "ci: sccache for the macOS scenario job's own crates; its single-app runs back in part 1\n\nrust-cache keeps the dependencies but never the workspace's own crates, so each macOS scenario\npart compiled purlis-core and the app afresh, 3.5 to 4 minutes on the slowest runners. sccache\n(mozilla-actions/sccache-action v0.0.11, sccache v0.18.0) keeps each compiled crate in the\nActions cache, written by `main` and only read by a pull request (SCCACHE_GHA_RW_MODE). It is\nswitched on after rust-cache's restore, because rust-cache keys its cache on every RUST* and\nCARGO* variable. A notice per part says its hits and misses, to keep it only if it pays.\n\nThe five single-app runs move back to part 1: part 2's half of the specs is the heavier, 13 to\n16 minutes against part 1's 7 to 11 even with the app's own build there now.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T17:20:39+04:00",
+          "tree_id": "6015e3687ec8492401a6afbfb7aef6a28c99374c",
+          "url": "https://github.com/purlis/purlis/commit/66b716207ad81a926dffaf500adbc6c129ea2b49"
+        },
+        "date": 1791811312793,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.27452350000000003,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.263, 0.271, 0.275, 0.280, 0.287 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.605104,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.544, 16.591, 16.605, 16.653, 16.656 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.4140235,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.803, 100.836, 101.414, 101.456, 101.458 ms"
           }
         ]
       }
