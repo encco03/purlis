@@ -132,6 +132,9 @@ call site.
 - **No alias under a verb purlis runs**: every call names one of git's own verbs, and git never
   takes an alias of the same name in its place.
 - **A call that crosses a network** (`run_network`) also holds the one-credential rule above.
+  When the window runs it against a host you have a purlis account on, that one credential is
+  your account's, through purlis's own helper ([forges.md](forges.md), "The git the window
+  runs", #752); otherwise it is the forge CLI's.
 
 | Entry point | For |
 | --- | --- |
