@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791804915682,
+  "lastUpdate": 1791808486472,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8526,6 +8526,48 @@ window.BENCHMARK_DATA = {
             "value": 101.341888,
             "unit": "ms",
             "extra": "median of 5 runs: 100.518, 101.223, 101.342, 101.734, 102.173 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "d4fec603f5eaa2fc2ccd387e7afd31cb60e495ac",
+          "message": "e2e: the gauge spec runs purlis in the run's own environment\n\nWith the harness and CLI built with the app (purlis-core/fenced), gauge.e2e.ts's statusline and\nhook calls were refused: they ran with the runner's own environment, so purlis opened the\nmachine store at ~/.config, outside the run's fenced tree. Unfenced, that was the operator's own\nstore on a local run (charter-app#129). Both now take theRunsEnvironment(plane), as the app does.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T15:41:36+04:00",
+          "tree_id": "c15ee8da67b0b3b86195a188511f2b7bc655333a",
+          "url": "https://github.com/purlis/purlis/commit/d4fec603f5eaa2fc2ccd387e7afd31cb60e495ac"
+        },
+        "date": 1791808485678,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.6082945,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.598, 0.604, 0.608, 0.609, 0.619 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.230038,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.132, 16.162, 16.230, 16.333, 16.379 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 101.880342,
+            "unit": "ms",
+            "extra": "median of 5 runs: 100.545, 101.064, 101.880, 101.885, 102.062 ms"
           }
         ]
       }
