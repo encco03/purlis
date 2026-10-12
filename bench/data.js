@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791761640758,
+  "lastUpdate": 1791764171555,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8064,6 +8064,48 @@ window.BENCHMARK_DATA = {
             "value": 101.460619,
             "unit": "ms",
             "extra": "median of 5 runs: 101.240, 101.393, 101.461, 101.721, 102.320 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "fc7131dd9e138f1e19890fe177a15a6fada9bee1",
+          "message": "End the Curate refusal with the harness card's line and label\n\nTrain 74 CI (harness-card.e2e.ts, #1134 line 2): every Curate row was\noff with \"No curation chat can open on the default profile ...: <card\nline> See What opencode can do here. Make another profile the default\nto curate from here.\", and the menu drew no card row under them: the\nwindow links a card only where a reason ends with its label (ADR 0072\n§3, cardLink.tsx), and this one went on past it. The advice now comes\nfirst and the card's line and label end the sentence. The unit test\nasserts the ending.\n\nRefs #1134\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T04:03:48+04:00",
+          "tree_id": "bf7408a4881f86f4682940ebd2d455cc3c3b56e1",
+          "url": "https://github.com/purlis/purlis/commit/fc7131dd9e138f1e19890fe177a15a6fada9bee1"
+        },
+        "date": 1791764170386,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5191445000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.492, 0.501, 0.519, 0.526, 0.531 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.093542499999998,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.949, 17.000, 17.094, 17.127, 17.167 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 103.8854715,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.417, 103.781, 103.885, 104.180, 106.438 ms"
           }
         ]
       }
