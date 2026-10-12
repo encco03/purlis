@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791831701095,
+  "lastUpdate": 1791839254184,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8778,6 +8778,48 @@ window.BENCHMARK_DATA = {
             "value": 105.3853025,
             "unit": "ms",
             "extra": "median of 5 runs: 102.591, 105.385, 105.385, 106.183, 106.916 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "09ea69d06b812bafabaec2e0433ac6082bc5a388",
+          "message": "review(train 84): the Inbox's Updates heading wraps its acts in a narrow sidebar\n\nThe diagnostic named it: `.inbox-updates-head` (\"Updates\", \"Mark all\nread\", \"Dismiss all\") ran 178px in 157px on macOS. DS-12 (#1844) drew the\ntwo acts as `.ui-button`, which keeps each label on one line, in a head\nthat never wrapped, so the line widened the Inbox. The head wraps now:\nheading and acts on one line where there is room, the acts under the\nheading where there is not.\n\nRefs #1844\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T01:03:39+04:00",
+          "tree_id": "70d5390ff39ef6e1ee7dac2931eb5a5d4688cfc2",
+          "url": "https://github.com/purlis/purlis/commit/09ea69d06b812bafabaec2e0433ac6082bc5a388"
+        },
+        "date": 1791839252972,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5073574999999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.493, 0.493, 0.507, 0.512, 0.520 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.265883000000002,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.440, 17.255, 17.266, 17.413, 17.716 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.934834,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.360, 104.056, 104.935, 105.511, 107.071 ms"
           }
         ]
       }
