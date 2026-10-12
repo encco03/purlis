@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791818427040,
+  "lastUpdate": 1791831701095,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8736,6 +8736,48 @@ window.BENCHMARK_DATA = {
             "value": 104.295286,
             "unit": "ms",
             "extra": "median of 5 runs: 102.909, 102.947, 104.295, 104.835, 107.299 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "5360f04bfe3a6bf6df3ad08685e3f4375dbf9fde",
+          "message": "review(train 83): the two CI reds on 1ee260e5\n\n- plane-format.md: the offered-mirrors record's tier reads as a tier,\n  then its reason after a dash, as the tier check reads every store.\n- hooks: the drain-while-running test expects the run its live call is\n  under first, as every live hook test does; the dedupe is unchanged.\n\nRefs #1583\nRefs #952\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T23:00:27+04:00",
+          "tree_id": "1f23403e10e21940adfb56cda4c7bc160f33468b",
+          "url": "https://github.com/purlis/purlis/commit/5360f04bfe3a6bf6df3ad08685e3f4375dbf9fde"
+        },
+        "date": 1791831699741,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5306649999999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.510, 0.525, 0.531, 0.540, 0.577 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.219911999999997,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.846, 16.910, 17.220, 17.258, 17.356 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.3853025,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.591, 105.385, 105.385, 106.183, 106.916 ms"
           }
         ]
       }
