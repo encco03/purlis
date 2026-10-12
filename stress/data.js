@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791806355328,
+  "lastUpdate": 1791810482347,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -322,6 +322,42 @@ window.BENCHMARK_DATA = {
             "value": 158.8,
             "unit": "MB",
             "extra": "median of 6 samples: 182, 189.8, 163.5, 153.5, 154.2, 123.5 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "d4fec603f5eaa2fc2ccd387e7afd31cb60e495ac",
+          "message": "e2e: the gauge spec runs purlis in the run's own environment\n\nWith the harness and CLI built with the app (purlis-core/fenced), gauge.e2e.ts's statusline and\nhook calls were refused: they ran with the runner's own environment, so purlis opened the\nmachine store at ~/.config, outside the run's fenced tree. Unfenced, that was the operator's own\nstore on a local run (charter-app#129). Both now take theRunsEnvironment(plane), as the app does.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4EJSYV68AZG1SWR231JAEZE\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T15:41:36+04:00",
+          "tree_id": "c15ee8da67b0b3b86195a188511f2b7bc655333a",
+          "url": "https://github.com/purlis/purlis/commit/d4fec603f5eaa2fc2ccd387e7afd31cb60e495ac"
+        },
+        "date": 1791810480873,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 757,
+            "unit": "MB",
+            "extra": "median of 3 samples: 639, 757, 853 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 168.5,
+            "unit": "MB",
+            "extra": "median of 6 samples: 182.1, 179.6, 182.5, 156.7, 157.4, 123.8 MB"
           }
         ]
       }
