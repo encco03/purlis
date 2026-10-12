@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791806215525,
+  "lastUpdate": 1791806355328,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -610,6 +610,42 @@ window.BENCHMARK_DATA = {
             "value": 417.9,
             "unit": "MB",
             "extra": "median of 6 samples: 383.5, 397.7, 410.1, 425.6, 426.4, 517.4 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "2e24d553b8377c380b90bf587d2f22c053b48a95",
+          "message": "A fenced build's stand-in config home is its process's own\n\nA test process of the app's suite kept this machine's sandbox record in one\nfolder of the temporary directory that every test process shared, so one\ntest's folders could refuse another's write. It is per user and process now;\na run that keeps its store across launches names one inside its fence.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-12T15:24:07+04:00",
+          "tree_id": "f6d38a79fd42190114e329549b586e5148911e5d",
+          "url": "https://github.com/purlis/purlis/commit/2e24d553b8377c380b90bf587d2f22c053b48a95"
+        },
+        "date": 1791806354542,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1368.4,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1225.1, 1368.4, 1472.4 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 409.1,
+            "unit": "MB",
+            "extra": "median of 6 samples: 383.7, 409.4, 414.7, 408.2, 408.8, 513 MB"
           }
         ]
       }
