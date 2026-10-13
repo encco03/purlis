@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791848512903,
+  "lastUpdate": 1791853517073,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -8988,6 +8988,48 @@ window.BENCHMARK_DATA = {
             "value": 102.450125,
             "unit": "ms",
             "extra": "median of 5 runs: 101.921, 102.129, 102.450, 103.530, 103.682 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "99b429fcabf7020dfef2003c8e165534d3e30c97",
+          "message": "review(train 88): a tab's counts go before its whole title, on any strip\n\nThe floor-only check left the 900px case red: the button sat above its\nmin-width and its title still drew nothing. The chip yields whenever\nthe title's drawn box is not a pixel wide, as the previous review had\nit. The tab-chip case that expected all three counts on its strip now\nasks for the counts that fit beside a drawn title, from the start and\nwhole: on that strip the third count only fitted by squeezing the\ntitle out, which is what #1867 decides against (D-1867-1).\n\nRefs #1867\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T05:04:01+04:00",
+          "tree_id": "e51722786989b413f5ea390bc3cc569f43b88b66",
+          "url": "https://github.com/purlis/purlis/commit/99b429fcabf7020dfef2003c8e165534d3e30c97"
+        },
+        "date": 1791853515510,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.446566,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.432, 0.436, 0.447, 0.447, 0.460 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.3244635,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.129, 16.243, 16.324, 16.356, 16.470 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 102.35945749999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 101.949, 102.108, 102.359, 102.557, 103.687 ms"
           }
         ]
       }
