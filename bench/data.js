@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791878202523,
+  "lastUpdate": 1791881593628,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -9240,6 +9240,48 @@ window.BENCHMARK_DATA = {
             "value": 103.868325,
             "unit": "ms",
             "extra": "median of 5 runs: 102.186, 102.442, 103.868, 104.633, 105.089 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "d7d7e7d62ced63b2b57d1b7c5d9848f410828f9d",
+          "message": "sandbox: a docker run down a pipe names its socket, so its Notice offers Allow\n\nA sandboxed Claude Code chat ran `docker run … 2>&1 | tail`, the sandbox\nrefused Docker its socket, and the pipe ended with tail's status. Claude\nCode handed the result over as one that came back, with Docker's words on\nstandard output and no failure beside them. A socket was named only from a\nfailed command (ADR 0093, D-sock-5), so the block reached the app with no\nsocket and the Notice said \"The sandbox did not say which socket it\nrefused\", with Start without the sandbox as its only way out.\n\nNo harness says how each program of a line ended, so the line is the one\nfailure signal left in the payload: where one of its own programs is a\ncontainer engine's client (docker, docker-compose, podman, podman-compose,\nnerdctl), by name after the shell's plumbing, the socket its output says it\nwas refused is named, on either stream and in Codex's and opencode's one\nstring. A line that only reads (cat, grep, git show, curl) still names\nnone, and neither does a violation line in a one-string result. Only a\nsocket is named this way; the certificate check keeps to a failed command.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T12:19:45+04:00",
+          "tree_id": "f2a3f62376c18fa57ddb43eb50a008cc4a5f27f4",
+          "url": "https://github.com/purlis/purlis/commit/d7d7e7d62ced63b2b57d1b7c5d9848f410828f9d"
+        },
+        "date": 1791881592924,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.5237430000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.498, 0.518, 0.524, 0.528, 0.538 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.0585435,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.448, 16.964, 17.059, 17.169, 17.268 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 105.24265349999999,
+            "unit": "ms",
+            "extra": "median of 5 runs: 104.495, 104.568, 105.243, 105.958, 107.400 ms"
           }
         ]
       }
