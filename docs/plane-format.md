@@ -1240,13 +1240,17 @@ key refuses.
 - **Git:** committed.
 - **Encoding details:** rows sorted by `(-dispatches, name)` (`charter/render.py:99`), a
   12-cell unicode bar (`charter/render.py:68`), and a `⚑` legend only when a flag appears.
-  The counts come from the committed dispatch log's tally and each persona's memory
-  directory — the **personas area** owns those. **purlis words it as what it is (#1460):**
-  the headline says how many dispatches to a persona the committed log holds, all from before
-  a persona ran as its own chat, and that `persona stats` counts the ones since from each
-  machine's own records, which this committed block never reads. The Python's mermaid pie of
-  dispatches to a persona against a generic agent is not drawn: a helper is no dispatch now,
-  and the log stopped receiving either row. `⚑` marks a persona the log holds no dispatch to.
+  The memory counts come from each persona's memory directory — the **personas area** owns
+  those. **The dispatch count is read when the block is written (#1460):** the committed
+  dispatch log's tally plus the dispatch records of the machine that runs `purlis docs`
+  (`<state>/app/dispatches/`, never committed, kept 30 days), the sum `persona stats` shows.
+  No count is stored for the block anywhere else. So the number in this committed block is
+  the one the machine that last regenerated it took, and the headline says so and names
+  `persona stats` for this machine's count now. Where those records are there and cannot be
+  read (a sandboxed chat is denied them), the block is left as it was, purlis says so and
+  `purlis docs generate` exits 1. The Python's mermaid pie of dispatches to a persona against
+  a generic agent is not drawn: a helper is no dispatch now. `⚑` marks a persona none of the
+  counted dispatches was to.
 
 ---
 

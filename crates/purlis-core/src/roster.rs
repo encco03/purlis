@@ -5,11 +5,14 @@
 //! work is actually routed to. A port of `charter/render.py`'s `personas_md` and
 //! `splice_personas`.
 //!
-//! **Every column comes from COMMITTED state** — the persona definitions, their memory
-//! files, the dispatch log. Not the dispatch records a machine keeps since a persona became a
-//! chat of its own (#1452, #1460): those are this machine's, and `persona stats` reads them. Vault health is deliberately absent: vaults are gitignored and
-//! per-engineer, so a column drawn from one would churn the README and conflict between
-//! checkouts.
+//! **Every column but one comes from COMMITTED state**: the persona definitions and their
+//! memory files. The dispatch count is the committed dispatch log's **plus the records this
+//! machine keeps of each dispatch** since a persona became a chat of its own (#1452, #1460):
+//! the sum `persona stats` shows. Those records are this machine's, never committed and kept 30
+//! days, so the count is the one the machine that regenerated the block took, and the block
+//! says so. No count is stored anywhere else for it (D-qw300-5): it is read when the block is
+//! written. Vault health is deliberately absent: vaults are gitignored and per-engineer, and
+//! nothing says so beside a vault column, so one would churn the README unexplained.
 //!
 //! **The plane's README is an operator's file.** charter owns the bytes between the two
 //! markers and nothing else: [`splice`] replaces that span and returns `None` when either
@@ -36,7 +39,8 @@ const BAR: u64 = 12;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Row {
     pub name: String,
-    /// Times work was dispatched to this persona, as the committed dispatch log counts it.
+    /// Times work was dispatched to this persona: the committed dispatch log's rows, and the
+    /// records the machine writing the block keeps.
     pub dispatches: u64,
     /// How many memory files it holds.
     pub memories: usize,
@@ -137,13 +141,13 @@ pub fn bar(n: u64, peak: u64) -> String {
 
 /// The whole generated block, markers included. `render.personas_md`, reworded (#1460).
 ///
-/// **The committed log is all it counts.** A persona's chats since it stopped being a
-/// sub-agent are counted from each machine's own dispatch records, which are never committed
-/// and kept 30 days ([`crate::dispatchrecord::tally`]); counting them here would make this
-/// committed block depend on which machine regenerated it last, and conflict between
-/// checkouts. So the headline says what the log holds and sends a reader to `persona stats`
-/// for the rest, and the share of "generic agents" the Python drew is gone: a helper is no
-/// dispatch now, and the log stopped receiving those rows too.
+/// **The headline says which dispatches are counted, and whose machine counted them.** The
+/// committed log holds the ones from before a persona ran as its own chat. The ones since are
+/// in each machine's own records, never committed and kept 30 days
+/// ([`crate::dispatchrecord::tally`]), and the caller adds the records of the machine it runs
+/// on. So two machines write two counts, and the block says that rather than pass one off as
+/// the project's. The share of "generic agents" the Python drew is gone: a helper is no
+/// dispatch now.
 pub fn block(plane: &Path, rows: &[Row]) -> String {
     let peak = rows.iter().map(|r| r.dispatches).max().unwrap_or(0);
     let total: u64 = rows.iter().map(|r| r.dispatches).sum();
@@ -155,19 +159,20 @@ pub fn block(plane: &Path, rows: &[Row]) -> String {
         "## Personas — roster & routing health".to_string(),
         String::new(),
     ];
-    let since = format!(
-        "Dispatches since are counted by `{program} persona stats`, from each machine's own \
-         records, which are never committed."
+    let counted = "the ones the committed dispatch log holds, and the ones recorded in the last \
+                   30 days on the machine that last regenerated this block";
+    let live = format!(
+        "Those records are never committed, so another machine counts differently: \
+         `{program} persona stats` gives this machine's count now."
     );
     if total == 0 {
         out.push(format!(
-            "_The committed dispatch log holds no dispatch to a persona._ {since}"
+            "_No dispatch to a persona is counted: none among {counted}._ {live}"
         ));
     } else {
         let dispatches = if total == 1 { "dispatch" } else { "dispatches" };
         out.push(format!(
-            "**The committed dispatch log holds {total} {dispatches} to a persona**, all from \
-             before a persona ran as its own chat. {since}"
+            "**{total} {dispatches} to a persona**: {counted}. {live}"
         ));
     }
     out.push(String::new());
@@ -201,7 +206,7 @@ pub fn block(plane: &Path, rows: &[Row]) -> String {
     out.push(String::new());
     if flagged {
         out.push(
-            "⚑ = **not in the log**: the committed log holds no dispatch to it. A persona \
+            "⚑ = **not dispatched to**: none of the dispatches counted above was to it. A persona \
              earns its place by carrying a capability a general-purpose chat can't have — a \
              credential/tool, or a domain narrow enough to name."
                 .to_string(),
@@ -280,24 +285,25 @@ mod tests {
     }
 
     #[test]
-    fn the_headline_says_what_the_committed_log_counts_and_where_the_rest_is_counted() {
-        // #1460: the log stopped moving when a persona stopped being a sub-agent, so the block
-        // says what it holds, and never a share of "generic agents" or "sub-agents".
+    fn the_headline_says_which_dispatches_it_counts_and_whose_machine_counted_them() {
+        // #1460: the count is the committed log's and the records of the machine that
+        // regenerated the block, and it says so. Never a share of "generic agents".
         let rows = [row("devops", 2), row("steward", 0)];
         let block = block(Path::new("/nonexistent-plane"), &rows);
 
         assert!(
             block.contains(
-                "**The committed dispatch log holds 2 dispatches to a persona**, all from before \
-                 a persona ran as its own chat."
+                "**2 dispatches to a persona**: the ones the committed dispatch log holds, and \
+                 the ones recorded in the last 30 days on the machine that last regenerated \
+                 this block."
             ),
             "{block}"
         );
         assert!(block.contains("`charter persona stats`"), "{block}");
         let one = super::block(Path::new("/nonexistent-plane"), &[row("devops", 1)]);
-        assert!(one.contains("holds 1 dispatch to a persona**"), "{one}");
+        assert!(one.contains("**1 dispatch to a persona**"), "{one}");
         assert!(block.contains("| `steward` ⚑ | 0 |"), "{block}");
-        assert!(block.contains("⚑ = **not in the log**"), "{block}");
+        assert!(block.contains("⚑ = **not dispatched to**"), "{block}");
         for retired in ["generic", "sub-agent", "```mermaid"] {
             assert!(!block.contains(retired), "{retired}: {block}");
         }
@@ -313,7 +319,7 @@ mod tests {
         );
 
         assert!(
-            block.contains("_The committed dispatch log holds no dispatch to a persona._"),
+            block.contains("_No dispatch to a persona is counted:"),
             "{block}"
         );
         assert!(!block.contains('⚑'), "{block}");
