@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791866636303,
+  "lastUpdate": 1791866654246,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -1546,6 +1546,42 @@ window.BENCHMARK_DATA = {
             "value": 428.3,
             "unit": "MB",
             "extra": "median of 6 samples: 397.3, 415.5, 424.8, 431.8, 432.1, 525.8 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "51a88a0b71b6dc7134ce2bea6aa181ccdb52c71f",
+          "message": "review(train 91): a declared harness's curation test declares it before its profile is read\n\nThe fixture read its `work` profile before the test wrote the harness\nthat profile's kind names, so the profile was not there. The plane now\ntakes the declaration first.\n\nRefs #967\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T08:09:12+04:00",
+          "tree_id": "fed1930f787644aeba67e8cf9f0a728f1e331352",
+          "url": "https://github.com/purlis/purlis/commit/51a88a0b71b6dc7134ce2bea6aa181ccdb52c71f"
+        },
+        "date": 1791866653190,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1506.9,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1338, 1506.9, 1560.3 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 434.5,
+            "unit": "MB",
+            "extra": "median of 6 samples: 404.8, 420.3, 429.2, 439.7, 440.4, 540.1 MB"
           }
         ]
       }
