@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791850887036,
+  "lastUpdate": 1791855444206,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -682,6 +682,42 @@ window.BENCHMARK_DATA = {
             "value": 172.4,
             "unit": "MB",
             "extra": "median of 6 samples: 208.8, 206.3, 175.3, 168.6, 169.4, 116.1 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "99b429fcabf7020dfef2003c8e165534d3e30c97",
+          "message": "review(train 88): a tab's counts go before its whole title, on any strip\n\nThe floor-only check left the 900px case red: the button sat above its\nmin-width and its title still drew nothing. The chip yields whenever\nthe title's drawn box is not a pixel wide, as the previous review had\nit. The tab-chip case that expected all three counts on its strip now\nasks for the counts that fit beside a drawn title, from the start and\nwhole: on that strip the third count only fitted by squeezing the\ntitle out, which is what #1867 decides against (D-1867-1).\n\nRefs #1867\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T05:04:01+04:00",
+          "tree_id": "e51722786989b413f5ea390bc3cc569f43b88b66",
+          "url": "https://github.com/purlis/purlis/commit/99b429fcabf7020dfef2003c8e165534d3e30c97"
+        },
+        "date": 1791855442762,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 899,
+            "unit": "MB",
+            "extra": "median of 3 samples: 836, 899, 994 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 186,
+            "unit": "MB",
+            "extra": "median of 6 samples: 216.6, 203.2, 200.1, 171.4, 172, 121.9 MB"
           }
         ]
       }
