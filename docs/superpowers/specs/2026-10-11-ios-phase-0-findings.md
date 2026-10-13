@@ -83,11 +83,12 @@ write), sent by tmux into a 120×40 PTY eight seconds into a thirty-second turn.
 | Harness | Verdict | Evidence |
 |---|---|---|
 | Claude Code | **queued** | `midturn/claude.log`: the pasted prompt is visible at t+13s while the count runs; at t+68s the count has reached 25 and the prompt was submitted as the next turn and answered `PINEAPPLE` |
-| Codex | pending (not logged in on this Mac) | |
-| opencode | pending (not logged in on this Mac) | |
+| Codex | not run | 2026-10-12: the user chose to go ahead with Claude Code alone; `midturn/midturn.sh codex codex` is ready for when it matters |
+| opencode | not run | same |
 
 **Consequence for §5.2:** for Claude Code, "a harness that is mid-turn queues it its own way"
-holds. Codex and opencode pending.
+holds. Phase 1 is built and tested against Claude Code; Codex and opencode are run through the
+same script before the phone is pointed at either.
 
 A detail the phone's Pair/first-run flow does not have but a desktop harness does: Claude Code
 asks whether to trust a new folder before anything else, with "No, exit" as the default. The
