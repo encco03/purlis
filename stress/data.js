@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791862942523,
+  "lastUpdate": 1791862959804,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -1474,6 +1474,42 @@ window.BENCHMARK_DATA = {
             "value": 435.7,
             "unit": "MB",
             "extra": "median of 6 samples: 401, 417.5, 427.2, 444.1, 444.8, 543.6 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "110881e6fd248ead35ee50f75aefc28565a515a7",
+          "message": "review(train 90): the app-identity rename test stores its token through a stand-in op\n\nA token is now stored only where an `op` is found to pin (issue 1517).\nThe rename test that follows the app to its new identity stored one on\na context with no PATH, so it stores through a stand-in `op`, as the\nkeychain-copy test does.\n\nRefs #1517\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T07:03:05+04:00",
+          "tree_id": "964853ab744e070cbc1605e7743461a8541bc03d",
+          "url": "https://github.com/purlis/purlis/commit/110881e6fd248ead35ee50f75aefc28565a515a7"
+        },
+        "date": 1791862958544,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1456.1,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1317.7, 1471.5, 1456.1 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 428.3,
+            "unit": "MB",
+            "extra": "median of 6 samples: 397.3, 415.5, 424.8, 431.8, 432.1, 525.8 MB"
           }
         ]
       }
