@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791850870434,
+  "lastUpdate": 1791850887036,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -1258,6 +1258,42 @@ window.BENCHMARK_DATA = {
             "value": 428.7,
             "unit": "MB",
             "extra": "median of 6 samples: 404.9, 415.3, 417.4, 439.9, 440.4, 513.1 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "25df81a66a564919e555651b2c81cd76ae66b954",
+          "message": "review(train 87): the cold start reports and does not gate, until #1876\n\nThe relative gate's first runs on this train held the same app code at\n0.98-1.03 in two jobs and 1.17-1.20 in two others, steadily across\nevery round. Nothing in the train runs at launch on Linux. Until the\ncause is found the cold start is evidence on pull requests too.\n\nRefs #1866, #1876\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T03:40:37+04:00",
+          "tree_id": "d54f484c4f78b65e6857b77fb365286fe3db66a1",
+          "url": "https://github.com/purlis/purlis/commit/25df81a66a564919e555651b2c81cd76ae66b954"
+        },
+        "date": 1791850885723,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1462.7,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1310.1, 1462.7, 1530 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 452.1,
+            "unit": "MB",
+            "extra": "median of 6 samples: 396.4, 417.2, 450.8, 453.4, 453.9, 554.2 MB"
           }
         ]
       }
