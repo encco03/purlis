@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791876022221,
+  "lastUpdate": 1791878202523,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -9198,6 +9198,48 @@ window.BENCHMARK_DATA = {
             "value": 104.562768,
             "unit": "ms",
             "extra": "median of 5 runs: 102.573, 103.020, 104.563, 105.070, 105.801 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "e968a31d877e1b566767c3898ddc035710d8b657",
+          "message": "review(train 92): the forge CLI test expects the preflight's sentence\n\nThe doctor this test file builds is the preflight, so where gh is found its\nsign-in row says the preflight asks no forge CLI. The test expected another\ndoctor's sentence and had only run where gh is absent.\n\nRefs #994\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T11:18:45+04:00",
+          "tree_id": "907877e4ca411a6e19adddd13b833e6dbcdaa0d8",
+          "url": "https://github.com/purlis/purlis/commit/e968a31d877e1b566767c3898ddc035710d8b657"
+        },
+        "date": 1791878201029,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.556457,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.521, 0.521, 0.556, 0.557, 0.567 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 16.543504,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.446, 16.493, 16.544, 16.601, 16.891 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 103.868325,
+            "unit": "ms",
+            "extra": "median of 5 runs: 102.186, 102.442, 103.868, 104.633, 105.089 ms"
           }
         ]
       }
