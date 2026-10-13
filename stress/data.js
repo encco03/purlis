@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791848547531,
+  "lastUpdate": 1791850870434,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -646,6 +646,42 @@ window.BENCHMARK_DATA = {
             "value": 199.9,
             "unit": "MB",
             "extra": "median of 6 samples: 236.5, 200, 201.8, 199.2, 199.8, 135.1 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "25df81a66a564919e555651b2c81cd76ae66b954",
+          "message": "review(train 87): the cold start reports and does not gate, until #1876\n\nThe relative gate's first runs on this train held the same app code at\n0.98-1.03 in two jobs and 1.17-1.20 in two others, steadily across\nevery round. Nothing in the train runs at launch on Linux. Until the\ncause is found the cold start is evidence on pull requests too.\n\nRefs #1866, #1876\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T03:40:37+04:00",
+          "tree_id": "d54f484c4f78b65e6857b77fb365286fe3db66a1",
+          "url": "https://github.com/purlis/purlis/commit/25df81a66a564919e555651b2c81cd76ae66b954"
+        },
+        "date": 1791850869337,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 797,
+            "unit": "MB",
+            "extra": "median of 3 samples: 742, 797, 971 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 172.4,
+            "unit": "MB",
+            "extra": "median of 6 samples: 208.8, 206.3, 175.3, 168.6, 169.4, 116.1 MB"
           }
         ]
       }
