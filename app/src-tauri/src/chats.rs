@@ -3781,6 +3781,7 @@ fn refused_by_the_proxy(
                 },
                 harness: harness.map(|harness| harness.name().to_owned()),
                 target: Some(purlis_core::sandbox::egress::host_and_port(host, port)),
+                read_back: false,
             };
             let _ = std::thread::Builder::new()
                 .name("purlis-refused".into())
@@ -3810,6 +3811,7 @@ fn refused_by_the_proxy(
                 },
                 harness: harness.map(|harness| harness.name().to_owned()),
                 target: None,
+                read_back: false,
             };
             let _ = std::thread::Builder::new()
                 .name("purlis-refused".into())
@@ -3928,6 +3930,7 @@ fn asked_by_the_proxy(asking: Asking, root: PathBuf) -> Arc<purlis_core::sandbox
                         },
                         harness: harness.map(|harness| harness.name().to_owned()),
                         target: Some(target),
+                        read_back: false,
                     };
                     told(Box::new(move || raise(block)));
                 }
@@ -4106,6 +4109,7 @@ pub(crate) mod tests {
                 },
                 harness: Some("codex".to_owned()),
                 target: Some("api.example.com:8443".to_owned()),
+                read_back: false,
             }
         );
         assert!(
@@ -4336,6 +4340,7 @@ pub(crate) mod tests {
                 },
                 harness: Some("opencode".to_owned()),
                 target: None,
+                read_back: false,
             }
         );
         assert!(
