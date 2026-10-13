@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791862959804,
+  "lastUpdate": 1791866636303,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -790,6 +790,42 @@ window.BENCHMARK_DATA = {
             "value": 222.4,
             "unit": "MB",
             "extra": "median of 6 samples: 214.7, 226.5, 223.2, 222, 222.7, 119.2 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "51a88a0b71b6dc7134ce2bea6aa181ccdb52c71f",
+          "message": "review(train 91): a declared harness's curation test declares it before its profile is read\n\nThe fixture read its `work` profile before the test wrote the harness\nthat profile's kind names, so the profile was not there. The plane now\ntakes the declaration first.\n\nRefs #967\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T08:09:12+04:00",
+          "tree_id": "fed1930f787644aeba67e8cf9f0a728f1e331352",
+          "url": "https://github.com/purlis/purlis/commit/51a88a0b71b6dc7134ce2bea6aa181ccdb52c71f"
+        },
+        "date": 1791866635332,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (footprint peak)",
+            "value": 895,
+            "unit": "MB",
+            "extra": "median of 3 samples: 813, 895, 981 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 194.6,
+            "unit": "MB",
+            "extra": "median of 6 samples: 236.7, 194.1, 195.9, 194.3, 195, 119.5 MB"
           }
         ]
       }
