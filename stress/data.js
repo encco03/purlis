@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791858187854,
+  "lastUpdate": 1791858205441,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "stress (macos-latest)": [
@@ -1402,6 +1402,42 @@ window.BENCHMARK_DATA = {
             "value": 454.2,
             "unit": "MB",
             "extra": "median of 6 samples: 407.7, 430, 450.1, 458.3, 458.7, 533 MB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "c430fde076ab33e8990b4d924a425cf7b78351e6",
+          "message": "review(train 89): the window-only count takes the two editor commands\n\nqw309 put open_in_your_editor and open_their_agents_md on WINDOW_ONLY;\nthe session protocol's count of that list now names them and takes two.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T05:49:31+04:00",
+          "tree_id": "0ceb1bd96fc360776310d0b25eaea2c928609f5c",
+          "url": "https://github.com/purlis/purlis/commit/c430fde076ab33e8990b4d924a425cf7b78351e6"
+        },
+        "date": 1791858204089,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "M2 web content at fifty hot chats (resident)",
+            "value": 1490.7,
+            "unit": "MB",
+            "extra": "median of 3 samples: 1334.8, 1490.7, 1528.8 MB"
+          },
+          {
+            "name": "M3 native side with no chats (resident)",
+            "value": 435.7,
+            "unit": "MB",
+            "extra": "median of 6 samples: 401, 417.5, 427.2, 444.1, 444.8, 543.6 MB"
           }
         ]
       }
