@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791860670996,
+  "lastUpdate": 1791864627681,
   "repoUrl": "https://github.com/purlis/purlis",
   "entries": {
     "session layer (ubuntu-24.04)": [
@@ -9114,6 +9114,48 @@ window.BENCHMARK_DATA = {
             "value": 105.946272,
             "unit": "ms",
             "extra": "median of 5 runs: 104.277, 105.377, 105.946, 106.439, 106.642 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eyehollow@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "dbrownsimple"
+          },
+          "committer": {
+            "email": "aaron.yor@gmail.com",
+            "name": "Aaron Yordanyan",
+            "username": "diazoxide"
+          },
+          "distinct": true,
+          "id": "51a88a0b71b6dc7134ce2bea6aa181ccdb52c71f",
+          "message": "review(train 91): a declared harness's curation test declares it before its profile is read\n\nThe fixture read its `work` profile before the test wrote the harness\nthat profile's kind names, so the profile was not there. The plane now\ntakes the declaration first.\n\nRefs #967\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nAssisted-by: claude-code:claude-opus-5-5\nPurlis-Chat: 01M4AREQXXRGBAEWM0SZ0N0WBN\nPurlis-Persona: steward",
+          "timestamp": "2026-10-13T08:09:12+04:00",
+          "tree_id": "fed1930f787644aeba67e8cf9f0a728f1e331352",
+          "url": "https://github.com/purlis/purlis/commit/51a88a0b71b6dc7134ce2bea6aa181ccdb52c71f"
+        },
+        "date": 1791864627015,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "keystroke under ten flooding panes",
+            "value": 0.509995,
+            "unit": "ms",
+            "extra": "median of 5 runs: 0.501, 0.504, 0.510, 0.518, 0.532 ms"
+          },
+          {
+            "name": "2 MB burst, asked to drawn",
+            "value": 17.12348,
+            "unit": "ms",
+            "extra": "median of 5 runs: 16.711, 17.115, 17.123, 17.146, 17.412 ms"
+          },
+          {
+            "name": "13 MB burst, asked to drawn",
+            "value": 104.46412000000001,
+            "unit": "ms",
+            "extra": "median of 5 runs: 103.603, 103.853, 104.464, 104.514, 105.048 ms"
           }
         ]
       }
